@@ -896,7 +896,13 @@ function normPaper(p){
   p = p||{};
   return {masthead:String(p.masthead||"世界日報"), headline:String(p.headline||"本日の世界"), lead:String(p.lead||""),
     articles:Array.isArray(p.articles)?p.articles.map(a=>({title:String(a.title||""),body:String(a.body||"")})):[],
-    briefs:Array.isArray(p.briefs)?p.briefs.map(String):[]};
+   briefs:Array.isArray(p.briefs)?p.briefs.map(b=>{
+  if(typeof b==="string") return b;
+  if(b && typeof b==="object"){
+    return String(b.text||b.body||b.content||b.message||b.title||JSON.stringify(b));
+  }
+  return String(b??"");
+}):[]};
 }
 function normProv(c, obj){
   const out = {};
