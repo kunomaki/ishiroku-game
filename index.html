@@ -576,8 +576,15 @@ const ERR = {
   empty_completion:"返答が空でした。もう一度実行してください。",
   upstream_error:"通信が途切れました。もう一度実行してください。"
 };
-function errMsg(e){ return (e && ERR[e.code]) || "エラーが発生しました（" + ((e&&e.code)||"unknown") + "）。もう一度実行してください。"; }
-
+function errMsg(e){
+  const base=(e && ERR[e.code]) || "エラーが発生しました（" + ((e&&e.code)||"unknown") + "）。もう一度実行してください。";
+  const detail=e && e.message ? String(e.message).trim() : "";
+  if(detail && detail!==base){
+    const safe=detail.slice(0,600);
+    return base + "\n詳細: " + safe;
+  }
+  return base;
+}
 let ctl = null, tick = null;
 function startBusy(label){
   S.busy = {label, t0:Date.now(), chars:0};
