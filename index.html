@@ -1,0 +1,1941 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>異史録</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* 号外の紙面：鉄灰色の新聞紙、墨、プルシアンブルーの朱印代わり。一画面アプリ＋下部タブ */
+:root{
+  --paper:#e7e7e2;
+  --sheet:#f3f3ef;
+  --ink:#17191e;
+  --muted:#5d6068;
+  --rule:#b9bab4;
+  --accent:#1f4e79;
+  --ok:#2e6a3b;
+  --part:#9a6a12;
+  --ng:#a2262b;
+  --display:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif;
+  --body:"Zen Kaku Gothic New","Hiragino Sans","Noto Sans JP",sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.7;-webkit-text-size-adjust:100%}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+#app{max-width:860px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;padding:0 16px 88px}
+header.top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:14px 0 10px;border-bottom:3px double var(--ink)}
+header.top h1{font-family:var(--display);font-weight:800;font-size:26px;margin:0;letter-spacing:.12em}
+header.top .sub{font-size:12px;color:var(--muted)}
+.linkbtn{background:none;border:none;padding:4px 0;color:var(--accent);font-weight:700;font-size:13px}
+h2{font-family:var(--display);font-size:20px;margin:18px 0 8px;text-wrap:balance}
+h3{font-family:var(--display);font-size:16px;margin:14px 0 6px}
+.note{font-size:13px;color:var(--muted)}
+.card{background:var(--sheet);border:1px solid var(--rule);padding:14px;display:flex;flex-direction:column;gap:6px}
+.stack{display:flex;flex-direction:column;gap:10px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{background:var(--ink);color:var(--sheet);border:none;padding:10px 16px;font-weight:700;letter-spacing:.04em}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--ink)}
+.btn.danger{background:transparent;color:var(--ng);border:1px solid var(--ng)}
+.chip{border:1px solid var(--ink);background:transparent;padding:6px 10px;font-size:13px}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--sheet)}
+label{font-size:13px;font-weight:700;display:block;margin-bottom:4px}
+input[type=text],textarea,select{width:100%;background:#fff;border:1px solid var(--rule);padding:10px;border-radius:0}
+textarea{min-height:140px;resize:vertical;line-height:1.6}
+.camp{cursor:pointer;text-align:left}
+.camp .t{font-family:var(--display);font-weight:700;font-size:17px}
+.camp .m{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+.roster{display:flex;flex-direction:column;gap:8px;max-height:60vh;overflow-y:auto;padding-right:2px}
+.lord{display:flex;align-items:baseline;justify-content:space-between;gap:10px;background:var(--sheet);border:1px solid var(--rule);border-left:5px solid var(--c);padding:10px 14px;text-align:left}
+.lord .n{font-family:var(--display);font-weight:700;font-size:19px}
+.lord .k{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.lord[aria-pressed="true"]{background:var(--ink);color:var(--sheet);border-color:var(--ink)}
+.lord[aria-pressed="true"] .k{color:#c9cac5}
+.lord[hidden]{display:none}
+.mapwrap{overflow:auto;background:#14161a;border:1px solid var(--ink);margin-top:10px;max-height:70vh;-webkit-overflow-scrolling:touch}
+.mapwrap svg{display:block}
+.mapwrap text{font-family:var(--body);font-size:10px;fill:#fff;pointer-events:none;font-weight:700;paint-order:stroke;stroke:rgba(0,0,0,.45);stroke-width:1.6px}
+.mapwrap rect{cursor:pointer}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;margin-top:8px}
+.legend i{display:inline-block;width:12px;height:12px;margin-right:5px;vertical-align:-1px}
+.tileinfo{font-size:14px;margin-top:8px;min-height:1.7em}
+.tcard{background:var(--sheet);border:1px solid var(--rule);padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.tcard.focus{border-color:var(--accent)}
+.tcard .tn{font-family:var(--display);font-weight:800;font-size:26px;line-height:1.2}
+.tcard .sw{display:inline-block;width:14px;height:14px}
+.tev p{margin:2px 0;font-size:14px}
+.evdot{cursor:pointer}
+.tolatest{position:fixed;right:16px;bottom:76px;z-index:6;background:var(--ink);color:var(--sheet);border:none;padding:8px 14px;font-weight:700;font-size:13px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.mapwrap{touch-action:pan-x pan-y}
+.crow{display:flex;gap:6px;align-items:stretch}
+.crow .contact{flex:1;min-width:0}
+.pin{flex:none;width:40px;background:var(--sheet);border:1px solid var(--rule);opacity:.45;font-size:15px}
+.pin.on{opacity:1;border-color:var(--part);background:#f1ece0}
+.bm{display:block;margin:4px 0 0 auto;background:none;border:none;opacity:.35;font-size:14px;padding:0}
+.bm.on{opacity:1}
+.msg.me .bm{filter:grayscale(1) brightness(2)}
+.paper.chron .mast .eyebrow{font-family:var(--display);color:var(--accent);letter-spacing:.3em;font-size:13px;font-weight:700}
+.olist{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.oi{font-size:14px;border-bottom:1px dotted var(--rule);padding-bottom:6px}
+.olab{font-size:11px;font-weight:700;border:1px solid currentColor;padding:0 6px;margin-left:6px;white-space:nowrap}
+.olab.ok{color:var(--ok)} .olab.part{color:var(--part)} .olab.ng{color:var(--ng)}
+.oreason{font-size:13px;color:var(--muted);margin:4px 0 0 1em}
+.truth{font-size:11px;font-weight:800;color:#fff;background:var(--ink);padding:1px 7px;margin-left:8px;letter-spacing:.2em}
+.secret-ev{border-left:4px solid var(--ink);padding-left:12px;padding-right:6px;background:rgba(23,25,30,.04)}
+.saved[hidden]{display:none}
+.pick{display:flex;gap:12px;align-items:center;text-align:left;background:var(--sheet);border:1px solid var(--rule);padding:10px 12px;width:100%}
+.pick.ind{margin-left:22px;width:calc(100% - 22px)}
+.pick[hidden]{display:none}
+.pick .av{flex:none;width:30px;height:30px;border-radius:50%;background:var(--ink);color:var(--sheet);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:800}
+.pick .cb{flex:1;min-width:0;display:flex;flex-direction:column}
+.pick .cn{font-weight:700}
+.pick .cs{font-size:12px;color:var(--muted)}
+.pick .chk{flex:none;width:24px;height:24px;border:1.5px solid var(--rule);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800}
+.pick[aria-pressed="true"]{border-color:var(--part)}
+.pick[aria-pressed="true"] .chk{background:var(--part);border-color:var(--part)}
+.sect{font-size:13px;color:var(--muted);letter-spacing:.15em;margin-top:8px}
+.composebar{position:sticky;bottom:64px;display:flex;justify-content:space-between;align-items:center;background:var(--paper);border-top:1px solid var(--rule);padding:8px 0}
+#newfree[hidden]{display:none}
+.mission{gap:6px;border-color:var(--accent)}
+.slots{display:flex;gap:4px}
+.slot{flex:1;height:8px;background:#d5d6d0}
+.slot.act{background:var(--accent)} .slot.q{background:var(--part)} .slot.over{outline:2px solid var(--ng)}
+.mi{display:flex;justify-content:space-between;gap:8px;font-size:14px;border-top:1px dotted var(--rule);padding-top:4px}
+.qsrc{font-size:11px;font-weight:700;color:var(--part);border:1px solid var(--part);padding:0 5px}
+.cstats{display:flex;flex-wrap:wrap;gap:4px 16px;font-variant-numeric:tabular-nums;font-weight:700}
+.cstats span,.pstats span{display:flex;flex-direction:column;line-height:1.3}
+.cstats small,.pstats small{font-size:11px;color:var(--muted);font-weight:400}
+.pstats{display:flex;flex-wrap:wrap;gap:4px 18px;font-variant-numeric:tabular-nums;font-weight:700}
+.datebtn{background:none;border:none;text-align:right;padding:0}
+.cal{margin-top:8px;gap:8px}
+.calt{font-family:var(--display);font-size:20px}
+.calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;font-variant-numeric:tabular-nums}
+.calgrid .dow{font-size:12px;color:var(--muted)}
+.calgrid .cd{padding:6px 0;font-size:14px;border:1px solid transparent;background:none}
+.calgrid .cd.mark{border-color:var(--part);font-weight:700;cursor:pointer}
+.calgrid .cd.cur{background:var(--part);color:#fff;font-weight:700}
+.calprev{border-top:1px solid var(--rule);padding-top:8px;display:flex;flex-direction:column;gap:6px}
+.chip.small{padding:4px 9px;font-size:12px}
+.maphead{display:flex;justify-content:space-between;gap:10px;background:var(--sheet);border:1px solid var(--rule);padding:10px 14px;margin-top:14px}
+.maptools{margin-top:8px}
+.quick{margin-top:10px}
+.diff{display:flex;flex-direction:column;gap:2px;text-align:left;background:var(--sheet);border:1px solid var(--rule);padding:10px 14px}
+.diff span{font-size:13px;color:var(--muted)}
+.diff[aria-pressed="true"]{border-color:var(--part);background:#f1ece0}
+.diff[aria-pressed="true"] strong{color:var(--part)}
+.intro{border-bottom:1px solid var(--rule);padding-bottom:8px}
+.intro p{line-height:1.8;margin:6px 0 0}
+.ans{display:block;margin-top:6px;font-size:12px;font-weight:700;border:1px solid currentColor;padding:1px 8px;width:max-content}
+.ans-合意{color:var(--ok)} .ans-条件付き{color:var(--part)} .ans-保留{color:var(--muted)} .ans-拒否{color:var(--ng)}
+.agc{color:var(--accent)!important}
+.sumcard{background:var(--sheet);border:1px solid var(--rule);border-left:4px solid var(--accent);padding:10px 14px;margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.sumcard .sl{font-weight:700;font-size:13px}
+.sumcard ul{margin:2px 0 0;padding-left:1.2em;font-size:14px}
+.prop{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--part);background:#f1ece0;padding:8px 12px;max-width:92%}
+.prop .btn{white-space:nowrap;flex:none}
+.guide p{line-height:1.8}
+.gtabs{margin-top:14px}
+.eyebrow-g{color:var(--part);font-weight:700;letter-spacing:.3em;font-size:13px;margin-top:8px}
+.gh{font-size:28px;margin:4px 0}
+.gex{border-left:3px solid var(--part);padding:4px 0 4px 14px}
+.shot{display:flex;flex-direction:column;gap:8px;background:var(--sheet);border:1px solid var(--ink);padding:10px;margin-top:8px}
+.shot img{width:100%;height:auto;display:block}
+.turnsep{font-family:var(--display);font-weight:800;letter-spacing:.2em;font-size:13px;border-bottom:2px solid var(--ink);padding:14px 0 2px;color:var(--muted)}
+.udot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#e2a93b;margin-left:4px;vertical-align:4px}
+.udot.static{margin:0;flex:none;align-self:center}
+.chronhead{text-align:center;padding:14px 0 10px;border-bottom:1px solid var(--rule)}
+.chronhead .eyebrow{font-family:var(--display);color:var(--accent);letter-spacing:.3em;font-size:13px;font-weight:700}
+.chronhead .big{font-family:var(--display);font-weight:800;font-size:40px;line-height:1.2}
+.chronhead .meta{font-size:13px;color:var(--muted);letter-spacing:.1em;font-variant-numeric:tabular-nums}
+.orders-log{margin:10px 0;font-size:14px}
+.orders-log summary{cursor:pointer;font-weight:700}
+.events{display:flex;flex-direction:column;margin-top:10px}
+.ev{border-bottom:1px solid var(--rule);padding:12px 0}
+.ev p{font-family:var(--display);font-size:18px;line-height:1.55;margin:4px 0 8px;font-weight:500}
+.evh{display:flex;justify-content:space-between;align-items:baseline}
+.cat{font-weight:700;font-size:13px;letter-spacing:.2em;color:var(--accent)}
+.cat.ng{color:var(--ng)} .cat.part{color:var(--part)}
+.eff{font-size:12px;border:1px solid var(--rule);background:var(--sheet);padding:2px 8px;font-variant-numeric:tabular-nums}
+.datebox{display:flex;justify-content:space-between;gap:10px;background:var(--sheet);border:1px solid var(--rule);padding:10px 14px;margin-top:14px}
+.qi{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;border-top:1px dotted var(--rule);padding-top:6px;font-size:14px}
+.contact{display:flex;gap:12px;align-items:flex-start;text-align:left;background:var(--sheet);border:1px solid var(--rule);padding:10px 12px;width:100%}
+.contact .av{flex:none;width:38px;height:38px;border-radius:50%;background:var(--ink);color:var(--sheet);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:800;font-size:18px}
+.contact .av.in{background:var(--accent)}
+.contact .cb{flex:1;min-width:0;display:flex;flex-direction:column}
+.contact .cn{font-weight:700}
+.contact .kind{font-size:11px;color:var(--muted);border:1px solid var(--rule);padding:0 5px;margin-left:6px;font-weight:400}
+.contact .cs{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.suggest{text-align:left;border-color:var(--part);background:#f1ece0}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.mcard{background:var(--sheet);border:1px solid var(--rule);padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.mcard .mn{font-size:13px;font-weight:700}
+.mcard .mv{font-family:var(--display);font-size:28px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.2;display:flex;align-items:baseline;gap:4px;flex-wrap:wrap}
+.mcard .mv small{font-size:13px;font-family:var(--body);color:var(--muted)}
+.mcard .mp{font-family:var(--body);font-size:12px;margin-left:auto;color:var(--muted)}
+.mcard svg{width:100%;height:34px}
+.plan{display:flex;flex-direction:column;gap:4px;padding:8px 0;border-bottom:1px solid var(--rule)}
+.plan .pt{font-weight:700}
+.plan .ps{font-size:13px;font-weight:700;color:var(--part);white-space:nowrap}
+select{width:100%;background:#fff;border:1px solid var(--rule);padding:10px;border-radius:0}
+nav.tabs button{font-size:13px;letter-spacing:.02em;padding:12px 2px}
+/* 紙面 */
+.paper{background:var(--sheet);border:1px solid var(--rule);padding:16px 18px 20px;margin-top:14px}
+.mast{text-align:center;border-bottom:3px double var(--ink);padding-bottom:6px}
+.mast .name{font-family:var(--display);font-weight:800;font-size:32px;letter-spacing:.2em;line-height:1.2}
+.mast .dl{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);border-top:1px solid var(--ink);margin-top:6px;padding-top:3px;font-variant-numeric:tabular-nums}
+.headline{font-family:var(--display);font-weight:800;font-size:27px;line-height:1.35;margin:14px 0 8px;text-wrap:balance}
+.lead{font-weight:700;border-bottom:1px solid var(--rule);padding-bottom:10px;margin:0}
+.arts{columns:2 260px;column-gap:22px;column-rule:1px solid var(--rule);margin-top:12px}
+.art{break-inside:avoid;margin:0 0 14px}
+.art h4{font-family:var(--display);font-size:17px;margin:0 0 4px;line-height:1.4}
+.art p{margin:0;text-align:justify}
+.verd{border:2px solid var(--ink);padding:10px 12px;margin-top:6px}
+.verd .ttl{font-family:var(--display);font-weight:800;letter-spacing:.3em;font-size:14px;border-bottom:1px solid var(--ink);margin-bottom:6px}
+.v{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;padding:6px 0;border-bottom:1px dotted var(--rule)}
+.v:last-child{border-bottom:none}
+.stamp{font-family:var(--display);font-weight:800;font-size:12px;border:2px solid currentColor;padding:1px 6px;align-self:start;white-space:nowrap}
+.stamp.ok{color:var(--ok)} .stamp.part{color:var(--part)} .stamp.ng{color:var(--ng)}
+.v .o{font-weight:700} .v .r{grid-column:2;font-size:13px;color:var(--muted)}
+.briefs{border-top:2px solid var(--ink);margin-top:10px;padding-top:6px}
+.briefs .ttl{font-family:var(--display);font-weight:800;letter-spacing:.3em;font-size:14px}
+.briefs ul{margin:4px 0 0;padding-left:1.1em}
+.deltas{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;font-variant-numeric:tabular-nums;margin-top:8px}
+.up{color:var(--ok)} .down{color:var(--ng)}
+.pager{display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-size:13px}
+
+/* 国情 */
+.stat{display:grid;grid-template-columns:3.5em 1fr 2.5em;gap:8px;align-items:center;font-variant-numeric:tabular-nums}
+.bar{height:8px;background:#d5d6d0;position:relative}
+.bar i{position:absolute;left:0;top:0;bottom:0;background:var(--ink)}
+.att{height:8px;background:#d5d6d0;position:relative}
+.att::after{content:"";position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--ink)}
+.att i{position:absolute;top:0;bottom:0}
+.rv .n{font-weight:700}
+.rv .s{font-size:12px;border:1px solid var(--ink);padding:0 6px;margin-left:6px}
+.secret{font-size:13px;color:var(--ng);border-left:3px solid var(--ng);padding-left:8px}
+
+/* 外交 */
+.chat{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.msg{padding:8px 12px;max-width:88%;white-space:pre-wrap}
+.msg.me{align-self:flex-end;background:var(--ink);color:var(--sheet)}
+.msg.them{align-self:flex-start;background:var(--sheet);border:1px solid var(--rule)}
+.msg .who{font-size:11px;opacity:.75;display:block}
+
+/* 進行中 */
+.busy{background:var(--sheet);border:1px solid var(--ink);padding:12px;display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:12px}
+.busy .dot{display:inline-block;width:8px;height:8px;background:var(--accent);margin-right:8px;animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.2}}
+@media (prefers-reduced-motion:reduce){.busy .dot{animation:none}}
+.err{color:var(--ng);font-size:13px;font-weight:700}
+
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--ink);display:flex;justify-content:center;z-index:5;padding-bottom:env(safe-area-inset-bottom)}
+nav.tabs .in{display:flex;max-width:860px;width:100%}
+nav.tabs button{flex:1;background:none;border:none;color:#c9cac5;padding:12px 4px;font-weight:700;font-size:14px;letter-spacing:.08em}
+nav.tabs button[aria-current="page"]{color:#fff;box-shadow:inset 0 3px 0 #8fb3d6}
+@media (max-width:420px){
+  .mast .name{font-size:26px}
+  .headline{font-size:22px}
+  .paper{padding:14px 12px 18px}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* 異史録・無料移植アダプター（Gemini API + IndexedDB） */
+(function(){
+  "use strict";
+  const KEY_NAME = "ishiroku_gemini_api_key";
+  const MODEL = "gemini-3.8-flash";
+  const DB_NAME = "ishiroku_local_db";
+  const STORE = "docs";
+  const getKey = () => { try { return localStorage.getItem(KEY_NAME) || ""; } catch(e) { return ""; } };
+  const setKey = value => { try { if(value) localStorage.setItem(KEY_NAME, value); else localStorage.removeItem(KEY_NAME); } catch(e) { throw new Error("このブラウザではAPIキーを保存できません"); } };
+  window.IshirokuAI = { hasKey: () => !!getKey(), setKey, removeKey: () => setKey("") };
+
+  function openDB(){
+    return new Promise((resolve,reject)=>{
+      const req=indexedDB.open(DB_NAME,1);
+      req.onupgradeneeded=()=>{ const db=req.result; if(!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE,{keyPath:"key"}); };
+      req.onsuccess=()=>resolve(req.result);
+      req.onerror=()=>reject(req.error||new Error("IndexedDBを開けません"));
+    });
+  }
+  async function idbPut(key,value){ const db=await openDB(); return new Promise((resolve,reject)=>{ const tx=db.transaction(STORE,"readwrite"); tx.objectStore(STORE).put({key,value}); tx.oncomplete=()=>{db.close();resolve();}; tx.onerror=()=>{db.close();reject(tx.error);}; }); }
+  async function idbDelete(key){ const db=await openDB(); return new Promise((resolve,reject)=>{ const tx=db.transaction(STORE,"readwrite"); tx.objectStore(STORE).delete(key); tx.oncomplete=()=>{db.close();resolve();}; tx.onerror=()=>{db.close();reject(tx.error);}; }); }
+  async function idbGetAll(){ const db=await openDB(); return new Promise((resolve,reject)=>{ const tx=db.transaction(STORE,"readonly"); const req=tx.objectStore(STORE).getAll(); req.onsuccess=()=>{db.close();resolve(req.result||[]);}; req.onerror=()=>{db.close();reject(req.error);}; }); }
+  const dbAdapter={collection:path=>({
+    doc:id=>({set:async value=>idbPut(path+"/"+id,value),delete:async()=>idbDelete(path+"/"+id)}),
+    get:async()=>({docs:(await idbGetAll()).filter(x=>x.key.startsWith(path+"/")).map(x=>({id:x.key.slice(path.length+1),exists:true,data:()=>x.value}))})
+  })};
+
+  function normalizeContents(input){
+    if(typeof input==="string") return [{role:"user",parts:[{text:input}]}];
+    const out=[];
+    for(const item of (Array.isArray(input)?input:[])){
+      const role=item.role==="assistant"||item.role==="model"?"model":"user";
+      const content=String(item.content??item.text??"");
+      if(!content) continue;
+      const last=out[out.length-1];
+      if(last && last.role===role) last.parts[0].text += "\n\n"+content;
+      else out.push({role,parts:[{text:content}]});
+    }
+    if(!out.length || out[0].role!=="user") out.unshift({role:"user",parts:[{text:"次の会話に回答してください。"}]});
+    return out;
+  }
+  async function callGemini(input, options={}, wantJSON=false){
+    const key=getKey();
+    if(!key) throw {code:"not_granted",message:"Gemini APIキーが未設定です。ホーム画面で設定してください。"};
+    const tier=options.modelTier||"default";
+    const config={maxOutputTokens:16384,thinkingConfig:{thinkingLevel:tier==="complex"?"high":"medium"}};
+    if(wantJSON) config.responseMimeType="application/json";
+    const body={contents:normalizeContents(input),generationConfig:config};
+    const response=await fetch("https://generativelanguage.googleapis.com/v1beta/models/"+MODEL+":generateContent",{
+      method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":key},body:JSON.stringify(body),signal:options.signal
+    });
+    let data={}; try{data=await response.json();}catch(e){}
+    if(!response.ok){
+      const msg=data?.error?.message||"Gemini API request failed";
+      if(response.status===429) throw {code:"rate_limited",message:msg};
+      if(response.status===401||response.status===403) throw {code:"not_granted",message:msg};
+      if(response.status===413) throw {code:"prompt_too_large",message:msg};
+      throw {code:"upstream_error",message:"HTTP "+response.status+": "+msg};
+    }
+    const candidate=data?.candidates?.[0];
+    if(!candidate) throw {code:"empty_completion",message:"Geminiから回答がありません"};
+    if(candidate.finishReason==="SAFETY") throw {code:"refused"};
+    if(candidate.finishReason==="MAX_TOKENS") throw {code:wantJSON?"invalid_json":"upstream_error",message:"出力上限で回答が途中終了しました"};
+    const text=(candidate.content?.parts||[]).map(x=>x.text||"").join("").trim();
+    if(!text) throw {code:"empty_completion"};
+    if(options.onText) options.onText({text});
+    if(!wantJSON) return text;
+    let cleaned=text.replace(/^```(?:json)?\s*/i,"").replace(/\s*```$/i,"").trim();
+    try{return JSON.parse(cleaned);}catch(e){
+      const a=cleaned.indexOf("{"), b=cleaned.lastIndexOf("}");
+      if(a>=0&&b>a){try{return JSON.parse(cleaned.slice(a,b+1));}catch(_) {}}
+      throw {code:"invalid_json",message:"JSON解析に失敗しました: "+text.slice(0,180)};
+    }
+  }
+  async function sample(input,options={}){ return {text:await callGemini(input,options,false)}; }
+  sample.json=(input,options={})=>callGemini(input,options,true);
+  const downloads={save:async({filename,data})=>{const url=URL.createObjectURL(data);const a=document.createElement("a");a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);return {status:"saved"};}};
+  const user={id:async()=>"local"};
+  if(!window.claude || !window.claude.use){
+    window.claude={use:async name=>({sample,db:dbAdapter,user,downloads})[name]||null};
+  }
+})();
+</script>
+<script>
+"use strict";
+/* ---------- 小道具 ---------- */
+const $app = document.getElementById("app");
+function h(tag, attrs, ...kids){
+  const el = document.createElement(tag);
+  if (attrs) for (const [k,v] of Object.entries(attrs)){
+    if (v == null || v === false) continue;
+    if (k === "class") el.className = v;
+    else if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
+    else if (k === "html") el.innerHTML = v;
+    else el.setAttribute(k, v === true ? "" : v);
+  }
+  for (const k of kids.flat()){
+    if (k == null || k === false) continue;
+    el.append(k instanceof Node ? k : document.createTextNode(String(k)));
+  }
+  return el;
+}
+const STATS = ["国力","軍事","財政","安定","威信"];
+const clamp = (n,a,b)=>Math.max(a,Math.min(b,n));
+const num = (x,d=0)=>{const n=Number(x);return Number.isFinite(n)?n:d;};
+const uidGen = ()=> "c" + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+
+const PRESETS = [
+  {id:"sengoku", label:"1560 戦国", title:"1560年 戦国乱世", intro:"桶狭間の戦いを目前にした日本。畿内を握る三好、西国の尼子・大友・毛利、東国の武田・北条・今川、そして一向宗、水軍、商人の自治都市、蝦夷地と琉球まで。六十五の勢力から一つを選び、この先の百年を書き換えよう。", era:"1560年春、日本の戦国時代（桶狭間の戦いの直前）", factions:[], roster:"三好家:7,尼子家:5,大友家:5,武田家:4,北条家:4,毛利家:4,今川家:3,南部家:3,北畠家:2,里見家:2,伊達家:2,本願寺:2,山名家:2,島津家:2,琉球王国:2,織田家:1,斎藤家:1,伊賀惣国一揆:1,長尾家（上杉）:1,千葉家:1,長野家（箕輪）:1,佐竹家:1,宇都宮家:1,蘆名家:1,相馬家:1,大崎家:1,葛西家:1,最上家:1,大宝寺家:1,安東家:1,蠣崎家:1,蝦夷地のアイヌ:1,本間家:1,神保家:1,能登畠山家:1,朝倉家:1,若狭武田家:1,三木家（姉小路）:1,室町幕府:1,畠山家（河内）:1,雑賀衆・根来衆:1,六角家:1,浅井家:1,一色家:1,赤松家:1,浦上家:1,三村家:1,河野家:1,長宗我部家:1,龍造寺家:1,有馬家:1,松浦家:1,宗家:1,相良家:1,伊東家:1,松平家:0,甲賀衆:0,波多野家:0,堺会合衆:0,興福寺:0,延暦寺:0,能島村上家:0,因島村上家:0,来島村上家:0,塩飽衆:0".split(",").map(x=>{const [n,k]=x.split(":");return {name:n,prov:Number(k)};})},
+  {id:"bakumatsu", label:"1863 幕末", era:"1863年、幕末の日本（八月十八日の政変前後）", factions:["長州藩","薩摩藩","会津藩","江戸幕府","土佐藩","肥前藩"]},
+  {id:"1914", label:"1914 大戦前夜", era:"1914年6月、サラエボ事件直後のヨーロッパと世界", factions:["ドイツ帝国","フランス","イギリス","ロシア帝国","オーストリア＝ハンガリー","セルビア","大日本帝国","オスマン帝国"]},
+  {id:"1939", label:"1939 大戦前夜", era:"1939年8月、第二次世界大戦勃発直前の世界", factions:["フィンランド","ポーランド","イギリス","フランス","ドイツ","ソ連","日本","アメリカ","イタリア"]},
+  {id:"1962", label:"1962 冷戦", era:"1962年10月、キューバ危機の最中の世界", factions:["アメリカ","ソ連","キューバ","西ドイツ","中国","日本","イギリス","フランス"]},
+  {id:"modern", label:"現代", era:"2026年の現代世界（実際の国際情勢を出発点とする）", factions:["日本","アメリカ","中国","インド","ドイツ","ブラジル","韓国","トルコ"]},
+  {id:"custom", label:"自由設定", era:"", factions:[]}
+];
+const MAPS = { sengoku: "蝦夷,14,0,蝦夷地のアイヌ;渡島,13,1,蠣崎家;津軽,12,2,南部家;糠部,13,2,南部家;秋田,12,3,安東家;閉伊,13,3,南部家;庄内,11,4,大宝寺家;最上,12,4,最上家;葛西,13,4,葛西家;置賜,11,5,伊達家;信夫,12,5,伊達家;大崎,13,5,大崎家;会津,11,6,蘆名家;仙道,12,6,国人衆;相馬,13,6,相馬家;佐渡,9,5,本間家;越後,10,6,長尾家（上杉）;能登,8,6,能登畠山家;越中,9,7,神保家;上野,10,7,長野家（箕輪）;下野,11,7,宇都宮家;常陸,12,7,佐竹家;加賀北,7,7,本願寺;加賀南,7,8,本願寺;飛騨,8,8,三木家（姉小路）;信濃北,9,8,武田家;北武蔵,10,8,北条家;下総,11,8,千葉家;丹後,4,9,一色家;若狭,5,9,若狭武田家;越前,6,9,朝倉家;美濃,7,9,斎藤家;信濃中,8,9,武田家;甲斐,9,9,武田家;南武蔵,10,9,北条家;上総,11,9,里見家;隠岐,0,9,尼子家;対馬,-6,10,宗家;石見,-1,10,尼子家;出雲,0,10,尼子家;伯耆,1,10,尼子家;因幡,2,10,山名家;但馬,3,10,山名家;丹波,4,10,三好家;山城,5,10,室町幕府;近江北,6,10,浅井家;尾張,7,10,織田家;信濃南,8,10,武田家;駿河,9,10,今川家;相模,10,10,北条家;安房,11,10,里見家;長門,-2,11,毛利家;周防,-1,11,毛利家;安芸,0,11,毛利家;備後,1,11,毛利家;美作,2,11,尼子家;播磨,3,11,赤松家;摂津,4,11,三好家;河内,5,11,畠山家（河内）;近江南,6,11,六角家;三河,7,11,今川家;遠江,8,11,今川家;伊豆,10,11,北条家;壱岐,-5,12,国人衆;筑前,-3,12,大友家;豊前,-2,12,大友家;備中,1,12,三村家;備前,2,12,浦上家;淡路,3,12,三好家;和泉,4,12,三好家;大和,5,12,三好家;伊賀,6,12,伊賀惣国一揆;伊勢,7,12,北畠家;肥前北,-5,13,松浦家;肥前東,-4,13,龍造寺家;筑後,-3,13,大友家;豊後,-2,13,大友家;伊予,0,13,河野家;讃岐,1,13,三好家;阿波,2,13,三好家;紀伊,5,13,雑賀衆・根来衆;志摩,7,13,北畠家;有馬,-4,14,有馬家;肥後北,-3,14,大友家;日向,-2,14,伊東家;土佐,1,14,長宗我部家;肥後南,-3,15,相良家;大隅,-2,15,島津家;薩摩,-3,16,島津家;奄美,-4,18,琉球王国;琉球,-5,19,琉球王国".split(";").map(x=>{const [n,c,r,o]=x.split(",");return {name:n,col:+c,row:+r,owner:o};}) };
+/* ---------- 実地形の地図（海岸線＋各国の中心点からボロノイ分割） ---------- */
+const COAST = {
+  honshu:[[141.0,41.5],[141.46,41.43],[141.42,41.0],[141.5,40.5],[141.85,40.0],[142.0,39.6],[141.9,39.27],[141.6,38.9],[141.5,38.3],[141.0,38.25],[140.95,37.8],[140.9,37.0],[140.65,36.6],[140.6,36.3],[140.85,35.7],[140.4,35.2],[139.85,34.9],[139.8,35.3],[140.1,35.6],[139.8,35.65],[139.65,35.45],[139.65,35.15],[139.15,35.25],[139.08,35.1],[139.15,34.7],[138.85,34.6],[138.75,35.0],[138.85,35.1],[138.5,35.0],[138.22,34.6],[137.75,34.65],[137.0,34.58],[137.35,34.75],[136.85,35.05],[136.55,34.7],[136.85,34.48],[136.9,34.3],[136.2,34.07],[135.78,33.43],[135.35,33.68],[135.1,34.0],[135.15,34.25],[135.45,34.6],[135.2,34.68],[134.7,34.75],[133.95,34.55],[133.4,34.45],[132.55,34.2],[132.2,34.15],[131.8,34.0],[131.25,33.95],[130.9,33.97],[130.95,34.35],[131.4,34.42],[132.08,34.9],[132.63,35.43],[133.32,35.57],[134.2,35.53],[134.82,35.65],[135.2,35.78],[135.38,35.5],[135.75,35.5],[136.05,35.65],[135.95,35.95],[136.6,36.6],[136.75,36.95],[136.9,37.3],[137.33,37.5],[137.0,37.15],[136.95,36.95],[137.2,36.75],[137.85,37.05],[138.25,37.2],[138.55,37.37],[139.05,37.95],[139.45,38.22],[139.83,38.92],[139.7,39.93],[140.0,40.2],[139.95,40.65],[140.35,41.25],[140.75,40.85],[140.85,40.95],[141.13,40.9],[141.2,41.3]],
+  kyushu:[[130.95,33.95],[131.0,33.7],[131.75,33.6],[131.6,33.25],[131.9,33.2],[131.9,32.95],[131.7,32.58],[131.45,31.9],[131.33,31.37],[131.1,31.45],[130.67,31.0],[130.8,31.45],[130.55,31.6],[130.65,31.23],[130.3,31.25],[130.2,31.72],[130.2,32.02],[130.4,32.2],[130.6,32.5],[130.6,32.8],[130.43,32.98],[130.4,33.15],[130.1,33.1],[130.05,32.88],[130.37,32.78],[130.2,32.6],[130.2,32.73],[129.75,32.58],[129.85,32.75],[129.72,33.17],[129.55,33.35],[129.85,33.3],[129.97,33.45],[130.15,33.58],[130.4,33.6],[130.5,33.8],[130.65,33.9]],
+  shikoku:[[134.6,34.2],[134.58,34.07],[134.67,33.9],[134.18,33.25],[133.55,33.5],[133.28,33.38],[133.02,32.72],[132.72,32.92],[132.55,33.22],[132.0,33.35],[132.42,33.45],[132.7,33.85],[133.0,34.07],[133.28,33.97],[133.65,34.12],[133.8,34.3],[134.05,34.35],[134.4,34.23]],
+  hokkaido:[[140.73,41.77],[140.1,41.42],[140.12,41.87],[139.85,42.45],[140.35,43.37],[141.0,43.2],[141.3,43.25],[141.65,43.95],[141.67,45.4],[141.95,45.52],[142.6,44.93],[143.35,44.35],[144.27,44.02],[145.3,44.35],[145.2,44.02],[145.58,43.33],[144.38,42.98],[143.25,41.92],[142.77,42.17],[141.6,42.63],[140.97,42.32],[140.58,42.1],[141.18,41.8]],
+  sado:[[138.25,38.32],[138.5,38.33],[138.55,38.1],[138.5,37.82],[138.2,37.82],[138.3,38.05]],
+  awaji:[[134.9,34.6],[135.02,34.55],[134.85,34.22],[134.68,34.27]],
+  oki:[[133.1,36.35],[133.35,36.32],[133.3,36.15],[133.05,36.12]],
+  tsushima:[[129.3,34.7],[129.48,34.68],[129.35,34.18],[129.2,34.3]],
+  iki:[[129.65,33.85],[129.8,33.84],[129.78,33.72],[129.66,33.74]],
+  amami:[[129.2,28.5],[129.7,28.5],[129.5,28.15],[129.25,28.2]],
+  okinawa:[[127.6,26.75],[128.3,26.88],[127.85,26.35],[127.68,26.08],[127.65,26.3]]
+};
+const PCENTER = {"蝦夷":[143.0,43.5],"渡島":[140.25,41.65],"津軽":[140.4,40.7],"糠部":[141.3,40.5],"秋田":[140.2,39.8],"閉伊":[141.6,39.6],"庄内":[139.9,38.75],"最上":[140.3,38.4],"葛西":[141.2,38.9],"置賜":[140.0,38.0],"信夫":[140.5,37.8],"大崎":[140.9,38.6],"会津":[139.8,37.4],"仙道":[140.4,37.25],"相馬":[140.95,37.7],"佐渡":[138.37,38.05],"越後":[138.95,37.7],"能登":[136.9,37.1],"越中":[137.2,36.6],"上野":[139.0,36.4],"下野":[139.8,36.6],"常陸":[140.35,36.4],"加賀北":[136.6,36.55],"加賀南":[136.45,36.3],"飛騨":[137.2,36.15],"信濃北":[138.2,36.6],"北武蔵":[139.3,36.05],"下総":[140.1,35.85],"丹後":[135.1,35.6],"若狭":[135.9,35.45],"越前":[136.25,35.95],"美濃":[136.9,35.55],"信濃中":[138.0,36.1],"甲斐":[138.6,35.6],"南武蔵":[139.55,35.65],"上総":[140.2,35.35],"隠岐":[133.2,36.23],"対馬":[129.33,34.45],"石見":[132.2,34.8],"出雲":[132.8,35.3],"伯耆":[133.5,35.35],"因幡":[134.2,35.4],"但馬":[134.7,35.45],"丹波":[135.35,35.15],"山城":[135.75,35.0],"近江北":[136.2,35.5],"尾張":[136.9,35.2],"信濃南":[137.9,35.6],"駿河":[138.4,35.15],"相模":[139.3,35.4],"安房":[139.95,35.05],"長門":[131.2,34.25],"周防":[131.8,34.1],"安芸":[132.6,34.5],"備後":[133.2,34.75],"美作":[133.9,35.1],"播磨":[134.75,34.95],"摂津":[135.4,34.8],"河内":[135.6,34.6],"近江南":[136.1,35.05],"三河":[137.3,34.9],"遠江":[137.85,34.85],"伊豆":[138.95,34.85],"壱岐":[129.72,33.78],"筑前":[130.55,33.6],"豊前":[131.0,33.55],"備中":[133.6,34.8],"備前":[134.1,34.75],"淡路":[134.85,34.42],"和泉":[135.4,34.42],"大和":[135.85,34.4],"伊賀":[136.15,34.75],"伊勢":[136.4,34.7],"肥前北":[129.75,33.25],"肥前東":[130.2,33.3],"筑後":[130.6,33.25],"豊後":[131.4,33.15],"伊予":[132.8,33.7],"讃岐":[133.95,34.2],"阿波":[134.3,33.9],"紀伊":[135.55,33.85],"志摩":[136.75,34.35],"有馬":[130.0,32.8],"肥後北":[130.8,32.95],"日向":[131.35,32.3],"土佐":[133.4,33.45],"肥後南":[130.75,32.3],"大隅":[130.95,31.5],"薩摩":[130.4,31.6],"奄美":[129.45,28.3],"琉球":[127.85,26.45]};
+// 投影: 経度は緯度35度で縮め、琉球・奄美は左下の別枠へ寄せる
+function proj(lon, lat){
+  let x = (lon-127)*Math.cos(35*Math.PI/180), y = (46-lat);
+  if (lat < 29.5){ x -= 0.9; y -= 1.4; }  // 南西諸島を左下に寄せる
+  return [x*60, y*60];
+}
+let GEO = null;
+function buildGeo(){
+  if (GEO) return GEO;
+  const islands = {}; let minX=1e9,minY=1e9,maxX=-1e9,maxY=-1e9;
+  for (const [k,pts] of Object.entries(COAST)){
+    islands[k] = pts.map(([lo,la])=>proj(lo,la));
+    for (const [x,y] of islands[k]){ minX=Math.min(minX,x); minY=Math.min(minY,y); maxX=Math.max(maxX,x); maxY=Math.max(maxY,y); }
+  }
+  const pad = 20, names = Object.keys(PCENTER), sites = names.map(n=>proj(...PCENTER[n]));
+  const box = [[minX-pad,minY-pad],[maxX+pad,minY-pad],[maxX+pad,maxY+pad],[minX-pad,maxY+pad]];
+  // 各点のボロノイ領域 = 箱を他の全点との垂直二等分線で切り取ったもの
+  const cells = {};
+  sites.forEach((p,i)=>{
+    let poly = box.slice();
+    sites.forEach((q,j)=>{
+      if (i===j || poly.length<3) return;
+      const mx=(p[0]+q[0])/2, my=(p[1]+q[1])/2, nx=q[0]-p[0], ny=q[1]-p[1];
+      const side = (pt)=>(pt[0]-mx)*nx+(pt[1]-my)*ny; // <=0 なら p 側
+      const out=[];
+      for (let k=0;k<poly.length;k++){
+        const a=poly[k], b=poly[(k+1)%poly.length], sa=side(a), sb=side(b);
+        if (sa<=0) out.push(a);
+        if ((sa<=0)!==(sb<=0)){ const t=sa/(sa-sb); out.push([a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t]); }
+      }
+      poly = out;
+    });
+    cells[names[i]] = poly;
+  });
+  GEO = {islands, cells, sites:Object.fromEntries(names.map((n,i)=>[n,sites[i]])), bounds:[minX-pad,minY-pad,maxX+pad,maxY+pad]};
+  return GEO;
+}
+const polyPath = (pts)=>"M"+pts.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join("L")+"Z";
+
+function hueOf(n){let x=7;for(const ch of n)x=(x*131+ch.charCodeAt(0))%360;return x;}
+const COLOR_IDX = {};
+function ownerColor(o){
+  if (o==="国人衆") return "#6f716c";
+  if (!Object.keys(COLOR_IDX).length) PRESETS.forEach(p=>(p.roster||[]).forEach((f,i)=>{ if(!(f.name in COLOR_IDX)) COLOR_IDX[f.name]=i; }));
+  const i = COLOR_IDX[o];
+  if (i==null) return `hsl(${hueOf(o)} 42% 40%)`;
+  return `hsl(${(i*137.508)%360} ${i%2?38:50}% ${i%3===0?34:i%3===1?42:48}%)`;
+}
+function territoryText(c){
+  if(!c.map) return "";
+  const g={}; for(const [p,o] of Object.entries(c.map)) (g[o]=g[o]||[]).push(p);
+  return Object.entries(g).sort((a,b)=>b[1].length-a[1].length).map(([o,ps])=>`${o}=${ps.join("・")}`).join(" / ");
+}
+const DIFFS = [["無制約","宣言したことがそのまま事実になる。裁定も拒否もない。"],["自由","世界は否と言わない。あり得ない命令も通る。ただし代償は残る。"],["標準","命令は、その勢力に実際にできることと照らして裁定される。"],["苛烈","身の丈を超えた野心は潰え、世界がその理由を告げる。"]];
+const DIFF_RULE = {
+  "無制約":"難易度「無制約」: プレイヤーの命令は宣言どおりそのまま事実になる。裁定は常に「完全成功」とし、reason には何が実現したかを書く。他勢力は結果に反応してよい。",
+  "自由":"難易度「自由」: どんな命令も実行される（失敗にしない）。ただし非現実的な命令ほど重い代償（指標の悪化・反発・副作用・他勢力の警戒）を必ず伴わせ、reason に代償を書く。",
+  "標準":"難易度「標準」: 規則1のとおり現実的に裁定する。",
+  "苛烈":"難易度「苛烈」: 裁定を厳しくする。国力・時機・準備のどれかが足りない命令は失敗させ、なぜ潰えたかを具体的に告げる。他勢力は抜け目なく隙を突く。"
+};
+const TURN_UNITS = ["自動","1週","1か月","3か月","半年","1年"];
+
+/* ---------- 状態 ---------- */
+const S = {
+  sample:null, db:null, uid:null, ready:false, storage:"loading",
+  camps:[], cur:null, view:"home", tab:"paper", paperIdx:null, god:false,
+  dipWith:null, busy:null, err:"", setup:{preset:"sengoku", era:"", faction:"", mode:"standard", diff:"標準", unit:"自動", notes:""},
+  draftOrders:"", draftMsg:"", draftAdv:"", importText:"", chronAll:false, catFilter:null, guide:null, advId:null, showOld:false, savedView:false, savedQ:"", cal:false, calYM:null, layer:"勢力図", mapMode:"real", mapZoom:2, facQuery:"", shot:null, downloads:null
+};
+
+/* ---------- 保存 ---------- */
+let saveChain = Promise.resolve();
+const CHUNK_CHARS = 60000, MAX_SAVE_BYTES = 3000000;
+const byteLen = s => new TextEncoder().encode(s).length;
+const chunkCount = {};   // キャンペーンid → 直近に把握している片の数
+function trimForSave(c){
+  let s = JSON.stringify(c);
+  if (byteLen(s) <= MAX_SAVE_BYTES) return s;
+  const copy = JSON.parse(s);   // 保存用コピーだけ削る（メモリ上の c は変えない）
+  while (byteLen(s) > MAX_SAVE_BYTES && (copy.papers||[]).length > 5){ copy.papers.splice(0, 5); s = JSON.stringify(copy); }
+  while (byteLen(s) > MAX_SAVE_BYTES && (copy.dipLog||[]).length > 20){ copy.dipLog.splice(0, 20); s = JSON.stringify(copy); }
+  return s;
+}
+function splitChunks(s){
+  const out = [];
+  for (let i=0; i<s.length;){
+    let e = Math.min(i+CHUNK_CHARS, s.length);
+    if (e < s.length){ const ch = s.charCodeAt(e-1); if (ch>=0xD800 && ch<=0xDBFF) e--; }   // サロゲートペアを割らない
+    out.push(s.slice(i,e)); i = e;
+  }
+  return out.length ? out : [""];
+}
+function lsGet(){ try { return JSON.parse(localStorage.getItem("ishiroku_camps")||"[]"); } catch(e){ return []; } }
+function lsPut(list){ for (let k=list.length; k>=1; k--){ try { localStorage.setItem("ishiroku_camps", JSON.stringify(list.slice(-k))); return; } catch(e){} } }
+const pieceId = (id,i)=> id+"~p"+i;
+async function cloudSave(c, body){
+  const col = S.db.collection("data/users/"+S.uid);
+  const parts = splitChunks(body), n = parts.length;
+  let old = chunkCount[c.id];
+  if (old == null){   // 初回: 既存の余り片を数える
+    old = 0;
+    try { const snap = await col.get(); for (const d of snap.docs){ const m = d.id.startsWith(c.id+"~p") && /^~p(\d+)$/.exec(d.id.slice(c.id.length)); if (m) old = Math.max(old, +m[1]+1); } } catch(e){}
+  }
+  for (let i=0; i<n; i++) await col.doc(pieceId(c.id,i)).set({part:i, of:n, u:c.updated, data:parts[i]});
+  await col.doc(c.id).set({v:2, title:c.title||"", updated:c.updated, chunks:n});
+  chunkCount[c.id] = n;
+  for (let i=n; i<old; i++){ try { await col.doc(pieceId(c.id,i)).delete(); } catch(e){} }
+}
+function saveCamp(c){
+  c.updated = Date.now();
+  const body = trimForSave(c);
+  // 端末内バックアップ（あくまで補助）
+  const ls = lsGet().filter(x=>x.id!==c.id); ls.push(JSON.parse(body)); lsPut(ls.slice(-8));
+  if (!(S.db && S.uid)) return Promise.resolve();
+  saveChain = saveChain.then(()=> cloudSave(c, body)
+      .catch(e=>{ S.err = e && e.code==="quota_exceeded" ? "保存容量が一杯です。古いキャンペーンを削除してください。" : "サーバーへの保存に失敗しました（端末内には保存済み・"+((e && e.code)||"unknown")+"）。"; render(); }));
+  return saveChain;
+}
+async function deleteCamp(c){
+  S.camps = S.camps.filter(x=>x.id!==c.id);
+  lsPut(lsGet().filter(x=>x.id!==c.id));
+  try { await saveChain; } catch(e){}
+  if (S.db && S.uid){
+    const col = S.db.collection("data/users/"+S.uid);
+    let n = chunkCount[c.id];
+    if (n == null){ n = 0; try { const snap = await col.get(); for (const d of snap.docs){ const m = d.id.startsWith(c.id+"~p") && /^~p(\d+)$/.exec(d.id.slice(c.id.length)); if (m) n = Math.max(n, +m[1]+1); } } catch(e){} }
+    delete chunkCount[c.id];
+    saveChain = saveChain.then(async ()=>{
+      for (let i=0; i<n; i++){ try { await col.doc(pieceId(c.id,i)).delete(); } catch(e){} }
+      try { await col.doc(c.id).delete(); } catch(e){}
+    });
+    await saveChain;
+  }
+}
+function assembleCloud(docs){
+  const pieces = {}, list = [];
+  for (const d of docs){
+    const m = /^(.+)~p(\d+)$/.exec(d.id);
+    if (m){ (pieces[m[1]] ||= {})[+m[2]] = d.data(); }
+  }
+  for (const d of docs){
+    if (/~p\d+$/.test(d.id)) continue;   // 片は一覧に出さない
+    try {
+      const data = d.data();
+      if (data && data.v === 2){
+        const ps = pieces[d.id] || {}; let txt = "";
+        for (let i=0; i<data.chunks; i++){
+          const p = ps[i];
+          if (!p || typeof p.data !== "string" || p.of !== data.chunks || (p.u != null && data.updated != null && p.u !== data.updated)) throw 0;
+          txt += p.data;
+        }
+        chunkCount[d.id] = data.chunks;
+        list.push(migrate(JSON.parse(txt)));
+      } else if (data && typeof data.json === "string") list.push(migrate(JSON.parse(data.json)));
+    } catch(e){}
+  }
+  return list;
+}
+async function loadCamps(){
+  let list = [];
+  if (S.db && S.uid){
+    try {
+      const snap = await Promise.race([
+        S.db.collection("data/users/"+S.uid).get(),
+        new Promise((_,rej)=>setTimeout(()=>rej({code:"timeout"}),10000))
+      ]);
+      list = assembleCloud(snap.docs);
+      S.storage = "local";
+    } catch(e){ S.storage = "local"; S.err = "セーブデータを読み込めませんでした。端末内のデータを表示しています。"; }
+  } else S.storage = "local";
+  // 端末内にしかない、または端末内の方が新しいものを合流
+  for (const c of lsGet()){
+    try {
+      const i = list.findIndex(x=>x.id===c.id);
+      if (i < 0) list.push(migrate(c));
+      else if ((c.updated||0) > (list[i].updated||0)) list[i] = migrate(c);
+    } catch(e){}
+  }
+  list.sort((a,b)=>(b.updated||0)-(a.updated||0));
+  S.camps = list;
+}
+
+/* ---------- Gemini API 呼び出し ---------- */
+const ERR = {
+  not_granted:"Gemini APIキーが未設定です。ホーム画面から設定してください。",
+  sampling_disabled:"この環境ではAI呼び出しを利用できません。",
+  rate_limited:"利用上限か呼び出し過多です。少し時間を置いてから再実行してください。",
+  session_expired:"Gemini APIキーを確認し、必要なら再登録してください。",
+  refused:"この命令内容では裁定を返せませんでした。表現を変えてください。",
+  invalid_json:"裁定結果の形式が崩れました。もう一度実行してください。",
+  prompt_too_large:"記録が長くなりすぎました。設定から古い記録を整理してください。",
+  empty_completion:"返答が空でした。もう一度実行してください。",
+  upstream_error:"通信が途切れました。もう一度実行してください。"
+};
+function errMsg(e){ return (e && ERR[e.code]) || "エラーが発生しました（" + ((e&&e.code)||"unknown") + "）。もう一度実行してください。"; }
+
+let ctl = null, tick = null;
+function startBusy(label){
+  S.busy = {label, t0:Date.now(), chars:0};
+  clearInterval(tick); tick = setInterval(()=>{ const el=document.getElementById("busyt"); if(el&&S.busy) el.textContent = busyText(); }, 1000);
+  render();
+}
+function busyText(){ const s=Math.round((Date.now()-S.busy.t0)/1000); return S.busy.label + "　" + s + "秒" + (S.busy.chars? "・" + S.busy.chars + "字" : "・思考中"); }
+function stopBusy(){ S.busy = null; clearInterval(tick); }
+async function askJSON(prompt, label, tier){
+  if (!S.sample) throw {code:"not_granted"};
+  ctl = new AbortController();
+  startBusy(label);
+  try {
+    return await S.sample.json(prompt, {signal: ctl.signal, cache:false, modelTier: tier||"default",
+      onText: ({text})=>{ if(S.busy){ S.busy.chars = text.length; const el=document.getElementById("busyt"); if(el) el.textContent = busyText(); } }});
+  } finally { stopBusy(); }
+}
+
+/* ---------- 1560年の65勢力の背景（固定データ）。c=確度 高/中/低 ---------- */
+const FACTION_LORE = {
+"三好家":{lord:"三好長慶",seat:"飯盛山城（河内）・芥川山城",kind:"大名",c:"高",note:"畿内の覇者。将軍足利義輝を事実上抑え、弟の三好実休（阿波）・安宅冬康（淡路水軍）・十河一存（讃岐）と重臣松永久秀が支える。1560年は河内の畠山高政を攻め、高屋城・飯盛山城を狙う。"},
+"尼子家":{lord:"尼子晴久",seat:"月山富田城（出雲）",kind:"大名",c:"高",note:"山陰の大勢力。石見銀山をめぐり毛利元就と争う。晴久は1561年初めに急死する（史実）。新宮党を粛清した後で、一門の層は薄い。"},
+"大友家":{lord:"大友義鎮（宗麟）",seat:"府内（豊後）",kind:"大名",c:"高",note:"九州北部の大大名。豊後・筑後に加え、筑前・豊前・肥後に勢力。キリスト教を保護し南蛮交易で富む。門司をめぐり毛利と対立。戸次鑑連（立花道雪）らが重臣。"},
+"武田家":{lord:"武田晴信（信玄）",seat:"躑躅ヶ崎館（甲斐）",kind:"大名",c:"高",note:"甲斐を本拠に信濃の大半を制圧。北信濃をめぐり長尾景虎と対立（川中島）。今川・北条と甲相駿三国同盟を結ぶ。山県・馬場・高坂ら家臣団が精強。"},
+"北条家":{lord:"北条氏康（1559年に氏政へ家督を譲るが実権を握る）",seat:"小田原城（相模）",kind:"大名",c:"高",note:"関東の覇者。伊豆・相模・武蔵の大半を支配し、古河公方を擁する。甲相駿三国同盟の一角。1561年に長尾景虎の大軍に小田原を囲まれる（史実）。"},
+"毛利家":{lord:"毛利元就（当主は嫡男隆元）",seat:"吉田郡山城（安芸）",kind:"大名",c:"高",note:"1555年の厳島の戦いで陶晴賢を破り、大内旧領の周防・長門を併呑。吉川元春・小早川隆景の「両川」が支える。石見銀山をめぐり尼子と、門司で大友と争う。"},
+"今川家":{lord:"今川義元",seat:"駿府（駿河）",kind:"大名",c:"高",note:"「海道一の弓取り」。駿河・遠江・三河を支配し、松平元康を従える。1560年5月（旧暦）、2万5千ともいわれる大軍で尾張へ進む。この直後に桶狭間で討たれる（史実）。"},
+"南部家":{lord:"南部晴政",seat:"三戸城（陸奥）",kind:"大名",c:"高",note:"陸奥北部の広大な領域を持つ。糠部郡を中心に一族・家臣の独立性が強く、津軽の大浦（のちの津軽為信）らを抱える。"},
+"北畠家":{lord:"北畠具教",seat:"多気御所・霧山城（伊勢）",kind:"大名（国司家）",c:"高",note:"伊勢国司の名門。南伊勢・志摩・大和の一部に勢力を持ち、北伊勢の国人とも争う。剣術家としても知られる。"},
+"里見家":{lord:"里見義堯（嫡男義弘とともに）",seat:"久留里城（上総）",kind:"大名",c:"高",note:"房総の大名。安房・上総を地盤に北条家と長く争う。1560年には北条の圧迫を受け、越後の長尾景虎に救援を求める。"},
+"伊達家":{lord:"伊達晴宗",seat:"米沢城（出羽）",kind:"大名",c:"高",note:"天文の乱（父稙宗との争い）を経て当主となる。奥州探題。周辺の諸家と婚姻で結びつく。"},
+"本願寺":{lord:"顕如",seat:"石山本願寺（摂津）",kind:"宗教勢力",c:"高",note:"浄土真宗の本山。門徒（一向一揆）を全国に抱え、加賀は「百姓の持ちたる国」として本願寺が実質支配。財力と動員力は大名に匹敵。"},
+"山名家":{lord:"山名祐豊（但馬）",seat:"此隅山城（但馬）",kind:"大名",c:"中",note:"かつての六分の一殿の名門だが衰退。但馬と因幡（因幡は一族の山名豊数ら）に分かれ、生野銀山を持つ。尼子・毛利の間で揺れる。"},
+"島津家":{lord:"島津貴久",seat:"内城（薩摩）",kind:"大名",c:"高",note:"薩摩をまとめ、大隅の平定を進める。嫡男義久・義弘・歳久・家久の四兄弟が育つ。鉄砲の早期導入で知られる。"},
+"琉球王国":{lord:"尚元王（1556年即位）",seat:"首里城",kind:"王国",c:"高",note:"中継貿易の王国。明に朝貢し、東南アジア・日本と交易。奄美を支配下に置く。戦国大名とは別格の外交主体。"},
+"織田家":{lord:"織田信長",seat:"清洲城（尾張）",kind:"大名",c:"高",note:"1559年に尾張をほぼ統一したばかり。兵は3千ほどとされる。今川義元の大軍が迫る。柴田勝家・丹羽長秀・木下藤吉郎らが仕える。"},
+"斎藤家":{lord:"斎藤義龍",seat:"稲葉山城（美濃）",kind:"大名",c:"高",note:"父道三を討って美濃を奪った。織田信長（道三の娘婿）と敵対。西美濃三人衆（稲葉・安藤・氏家）ら国人が強い。義龍は1561年に病没する（史実）。"},
+"伊賀惣国一揆":{lord:"なし（評定衆の合議）",seat:"伊賀国",kind:"合議制（惣国一揆）",c:"中",note:"伊賀の地侍たちの自治連合。掟（惣国一揆掟書）で団結し、外敵には共同で当たる。服部・百地・藤林などの家が知られ、忍びの術で名高い。隣の甲賀と協調する。"},
+"長尾家（上杉）":{lord:"長尾景虎（のちの上杉謙信）",seat:"春日山城（越後）",kind:"大名",c:"高",note:"越後を統一。関東管領上杉憲政を保護し、1560年夏に関東へ出陣して北条を攻める（史実）。信濃をめぐり武田と争う。"},
+"千葉家":{lord:"千葉胤富",seat:"本佐倉城（下総）",kind:"大名",c:"中",note:"下総の名門だが、北条家に従属する立場。原氏ら重臣の力が強い。"},
+"長野家（箕輪）":{lord:"長野業正",seat:"箕輪城（上野）",kind:"国衆",c:"中",note:"西上野の国衆の盟主。武田の侵攻を何度も退けた名将として知られる。業正は1561年頃没（諸説あり）。"},
+"佐竹家":{lord:"佐竹義昭",seat:"太田城（常陸）",kind:"大名",c:"高",note:"常陸北部を固め、南へ勢力を伸ばす。北条・白河結城と争い、のちに長尾景虎と結ぶ。"},
+"宇都宮家":{lord:"宇都宮広綱（幼少、家臣芳賀高定が補佐）",seat:"宇都宮城（下野）",kind:"大名",c:"中",note:"下野の名門。1557年頃に宇都宮城を回復したばかりで、壬生・那須など周辺と争う。"},
+"蘆名家":{lord:"蘆名盛氏",seat:"黒川城（会津）",kind:"大名",c:"高",note:"会津を本拠に最盛期を迎える。伊達・二階堂・田村らと争い、和を結ぶ。"},
+"相馬家":{lord:"相馬盛胤",seat:"小高城（陸奥）",kind:"大名",c:"中",note:"陸奥の浜通りの小大名。伊達家と長く争う。騎馬の家風。"},
+"大崎家":{lord:"大崎義直",seat:"名生城（陸奥）",kind:"大名",c:"中",note:"奥州探題の名家だが衰退し、伊達の影響下にある。家臣の離反が多い。"},
+"葛西家":{lord:"葛西晴胤〜親信の代（諸説あり。晴信の家督は1560年代）",seat:"寺池城（陸奥）",kind:"大名",c:"低",note:"陸奥北上川流域の名門。大崎と争い、伊達と結ぶ。家臣の浜田氏らの独立性が強く、統制に苦しむ。"},
+"最上家":{lord:"最上義守",seat:"山形城（出羽）",kind:"大名",c:"高",note:"出羽村山郡の大名。伊達の影響下を脱しつつある。のちに嫡男義光と対立する。"},
+"大宝寺家":{lord:"大宝寺義増（諸説あり）",seat:"尾浦城（出羽庄内）",kind:"大名",c:"低",note:"庄内の領主。大宝寺氏を優位とする庄内諸氏（土佐林・砂越・来次）の連合体制とみられ、越後長尾家に従う立場をとる。"},
+"安東家":{lord:"安東愛季",seat:"檜山城（出羽）",kind:"大名",c:"中",note:"出羽北部（秋田）の大名。日本海交易と蝦夷地の交易を押さえ、蠣崎家を従える立場。"},
+"蠣崎家":{lord:"蠣崎季広",seat:"大館・徳山館（渡島）",kind:"大名（安東家の代官）",c:"中",note:"蝦夷地南端の和人の支配者。安東家に従う。1550年頃にアイヌの首長たちと交易の取り決めを結び、商船からの税をアイヌ側にも分配した。"},
+"蝦夷地のアイヌ":{lord:"首長たちの連合（西のハシタイン、東のチコモタインらが知られる）",seat:"蝦夷地",kind:"首長連合",c:"中",note:"狩猟・漁労と交易で暮らす。和人の進出に抵抗した歴史を持つが、1550年頃の取り決め以降は蠣崎家と交易で共存している。"},
+"本間家":{lord:"佐渡の本間一族（羽茂本間・河原田本間などが並び立つ）",seat:"佐渡",kind:"一族の分立",c:"中",note:"佐渡を代々支配した一族。宗家より分家の羽茂本間と河原田本間が力を持ち、互いに争う。越後長尾家が調停に入る立場。"},
+"神保家":{lord:"神保長職",seat:"富山城（越中）",kind:"大名",c:"中",note:"越中西部の大名。椎名家（越中東部）と争い、長尾景虎の介入を招く。一向一揆も強い国。"},
+"能登畠山家":{lord:"畠山義綱",seat:"七尾城（能登）",kind:"大名",c:"中",note:"能登守護。家臣団（温井・遊佐・長など）の力が強く、内紛が続く。七尾城は堅城。"},
+"朝倉家":{lord:"朝倉義景",seat:"一乗谷（越前）",kind:"大名",c:"高",note:"越前を安定して治め、一乗谷は京の文化が栄える。加賀の一向一揆と対立。宿老朝倉宗滴は1555年に没している。"},
+"若狭武田家":{lord:"武田義統（父信豊と家督をめぐり対立）",seat:"後瀬山城（若狭）",kind:"大名",c:"中",note:"若狭守護の名門だが、父子の対立と国人の離反で弱体化。将軍家と縁が深い。"},
+"三木家（姉小路）":{lord:"三木良頼",seat:"桜洞城（飛騨）",kind:"大名",c:"中",note:"飛騨の国人から伸し上がり、公家の姉小路の名を名乗って権威を得ようとしている。江馬氏らと争う。"},
+"室町幕府":{lord:"将軍足利義輝",seat:"京（二条御所）",kind:"幕府",c:"高",note:"1558年に三好長慶と和睦し京に戻った。実権は乏しいが、御内書・調停・官位の推挙などの権威で諸大名に影響を与える。剣術を好む。"},
+"畠山家（河内）":{lord:"畠山高政",seat:"高屋城（河内）",kind:"大名",c:"高",note:"河内・紀伊の守護。重臣の遊佐信教・安見宗房らとの関係が不安定。1560年に三好長慶の攻撃で高屋城を失う（史実）。"},
+"雑賀衆・根来衆":{lord:"なし（雑賀は鈴木・土橋らの合議、根来は根来寺の行人方）",seat:"紀伊北部",kind:"鉄砲傭兵集団・寺院勢力",c:"中",note:"鉄砲を大量に持つ紀伊の武装集団。雑賀は地侍の連合、根来は僧兵の寺院勢力。金で雇われて各地の戦に加わる。"},
+"六角家":{lord:"六角義賢（承禎）。1559年頃に嫡男義治へ家督",seat:"観音寺城（南近江）",kind:"大名",c:"高",note:"南近江の守護大名。重臣の後藤賢豊・進藤賢盛ら「両藤」が支える。甲賀衆を軍事力として頼る。1560年夏、野良田の戦いで浅井賢政に敗れる（史実）。"},
+"浅井家":{lord:"浅井賢政（のちの長政）",seat:"小谷城（北近江）",kind:"大名",c:"高",note:"六角家に従属していたが、若い賢政が父久政を退けて独立へ。1560年夏の野良田の戦いで六角を破る（史実）。"},
+"一色家":{lord:"一色義道（1558年に家督を継いだとされる。父義幸は実在が疑われる）",seat:"建部山城（丹後）",kind:"大名",c:"低",note:"丹後守護の名門だが、守護代延永氏ら国人の離反で衰えている。隣国の若狭武田とは丹後をめぐり争った因縁がある。"},
+"赤松家":{lord:"赤松義祐",seat:"置塩城（播磨）",kind:"大名",c:"中",note:"播磨守護の名門だが実権は衰え、浦上・小寺・別所など国人が自立している。"},
+"浦上家":{lord:"浦上宗景",seat:"天神山城（備前）",kind:"大名",c:"中",note:"赤松家の守護代から自立した備前の勢力。兄政宗と争う。家臣に宇喜多直家がいる。"},
+"三村家":{lord:"三村家親",seat:"備中松山城・鶴首城",kind:"大名",c:"中",note:"備中の国人から伸し上がる。毛利と結んで尼子に対抗し、備中統一を進める。"},
+"河野家":{lord:"河野通宣",seat:"湯築城（伊予）",kind:"大名",c:"中",note:"伊予の守護。来島村上家ら水軍との結びつきが強い。宇都宮・西園寺など国内の諸氏と争う。"},
+"長宗我部家":{lord:"長宗我部国親（1560年夏に没し、元親が継ぐ。史実）",seat:"岡豊城（土佐）",kind:"国人から大名へ",c:"高",note:"土佐七雄の一つ。1560年の長浜の戦いで元親が初陣を飾る（史実）。本山家と争う。"},
+"龍造寺家":{lord:"龍造寺隆信",seat:"村中城（佐嘉、肥前）",kind:"大名",c:"高",note:"一度は追われたが肥前東部に返り咲き、少弐家を圧倒する。家臣に鍋島直茂（信生）。大友家と緊張関係。"},
+"有馬家":{lord:"有馬義貞（父晴純が後見）",seat:"日野江城（肥前島原）",kind:"大名",c:"中",note:"肥前南部の大名。南蛮貿易に関心を持つ。大村家と縁戚。龍造寺の台頭に圧される。"},
+"松浦家":{lord:"松浦隆信（道可）",seat:"平戸（肥前）",kind:"大名",c:"中",note:"平戸を拠点に南蛮貿易・倭寇とつながり富を得る。ポルトガル船が入港している。"},
+"宗家":{lord:"宗義調",seat:"府中（対馬）",kind:"大名",c:"中",note:"対馬の領主。朝鮮との通交・貿易の窓口を独占し、それが家の命綱。"},
+"相良家":{lord:"相良義陽（幼少で家督、1555年）",seat:"人吉城（肥後南部）",kind:"大名",c:"中",note:"肥後南部の球磨郡の大名。島津・伊東と境を接し、外交で生き残る。"},
+"伊東家":{lord:"伊東義祐",seat:"佐土原城（日向）",kind:"大名",c:"高",note:"日向の大部分を支配し全盛期。飫肥をめぐって島津と長く争う。"},
+"松平家":{lord:"松平元康（のちの徳川家康）",seat:"岡崎（三河）。ただし今川家の支配下",kind:"今川家の従属国衆",c:"高",note:"幼少期を今川家の人質として過ごし、今川軍の一将として尾張攻めに従う。三河の家臣団は独立を望んでいる。桶狭間の後に岡崎へ戻る（史実）。"},
+"甲賀衆":{lord:"なし（甲賀郡中惣の合議。望月・山中・大原・和田・伴などの家）",seat:"甲賀郡（南近江）",kind:"合議制（郡中惣）",c:"中",note:"同じ苗字の一族が「同名中」をつくり、本家と分家が横並び。掟を定め、多数決で決め、決まらなければくじ。郡規模の「郡中惣」は永禄年間頃に形成されたと考えられる。六角家の軍事の主力。隣の伊賀と協調する。忍びで名高い。"},
+"波多野家":{lord:"波多野元秀",seat:"八上城（丹波）。1557年頃に松永長頼らに奪われ、居城を失っている",kind:"国衆",c:"中",note:"丹波の有力国衆。三好方に追われ、城の奪還を狙う。"},
+"堺会合衆":{lord:"なし（豪商たちの会合による自治）",seat:"堺（和泉）",kind:"自治都市",c:"高",note:"堀で囲まれた自治都市。南蛮・明との交易、鉄砲の生産と流通で栄える。今井宗久・津田宗及らが知られる。三好家と深く結びつく。"},
+"興福寺":{lord:"興福寺（衆徒・国民が武力を担う）",seat:"奈良（大和）",kind:"寺院勢力",c:"中",note:"大和の守護職を担ってきた大寺院。配下の筒井氏ら衆徒が武力を持つ。三好・松永の大和進出に圧される（松永は1559年から大和に入る）。"},
+"延暦寺":{lord:"天台座主（実務は大衆・僧兵）",seat:"比叡山（近江・山城）",kind:"寺院勢力",c:"高",note:"天台宗の総本山。広大な荘園と僧兵を持ち、京の政治に口を出す。坂本の町を押さえる。"},
+"能島村上家":{lord:"村上武吉",seat:"能島（伊予・芸予諸島）",kind:"海賊衆（水軍）",c:"高",note:"三島村上の筆頭。航行する船から通行料をとり、通行の安全を保証する。独立性が強く、毛利・大友・河野の間で立場を選ぶ。"},
+"因島村上家":{lord:"村上吉充",seat:"因島（備後）",kind:"海賊衆（水軍）",c:"中",note:"三島村上の一つ。毛利家との結びつきが強い。"},
+"来島村上家":{lord:"村上通康",seat:"来島（伊予）",kind:"海賊衆（水軍）",c:"中",note:"三島村上の一つ。伊予の河野家の重臣として結びつく。"},
+"塩飽衆":{lord:"なし（年寄による島の自治）",seat:"塩飽諸島（備讃瀬戸）",kind:"船方衆",c:"低",note:"操船に長けた島の人々。廻船と水軍の力を持ち、瀬戸内の物流を担う。特定の大名に属さず、利のある側につく。"}
+};
+function loreText(names){
+  return names.filter(n=>FACTION_LORE[n]).map(n=>{ const f=FACTION_LORE[n]; return `【${n}】当主: ${f.lord}／本拠: ${f.seat}／体制: ${f.kind}${f.c==="低"?"（資料が乏しく諸説あり）":""}／${f.note}`; }).join("\n");
+}
+function loreKey(name){ const s=String(name||""); if (FACTION_LORE[s]) return s; const k = Object.keys(FACTION_LORE).find(k=>s.startsWith(k)||k.startsWith(s.replace(/（.*$/,""))); return k||null; }
+
+const NUM_RULE = "数量（兵数・石高・日数・金額・人数など）は算用数字で書く（例: 1,500人、24万石、3日、千貫→1,000貫）。人名・地名・家名・慣用表現の漢数字（甲賀五十三家、四国、三好長慶、一騎打ち）はそのまま。";
+/* ---------- プロンプト ---------- */
+const PAPER_FMT = `"newspaper": {"masthead":"新聞名（時代と土地にふさわしい名称）","headline":"一面見出し(30字以内)","lead":"リード文(100字前後)","articles":[{"title":"記事見出し","body":"本文(150〜240字)"}],"briefs":["各地短信(40字前後)"]}　※articlesは1〜3本、briefsは3〜5本`;
+const RIVAL_FMT = `{"name":"勢力名","leader":"当主・指導者名","attitude":-100〜100の整数(プレイヤーへの態度),"stance":"同盟|友好|中立|警戒|敵対","public_note":"プレイヤーが知りうる情報(60字)","hidden_agenda":"プレイヤーに隠している本音や秘密計画(60字)"}`;
+const METRIC_FMT = `{"name":"指標名","value":数値,"unit":"単位(人・%・貫など。なければ空文字)"}`;
+const DATE_RULE = "日付は必ず「YYYY年M月D日」の形式（例: 1560年6月24日）。" + NUM_RULE;
+
+function initPrompt(st){
+  return `あなたはテキスト型グランドストラテジーゲームの「世界生成役」です。プレイヤーが1勢力を率いる架空歴史キャンペーンの初期状態を作ってください。
+
+方針:
+- 史実の時代なら、その時点の実在の情勢・人物・地名・技術水準に忠実に。確信のない細部は創作せず、一般的な記述にとどめる。
+- 架空世界なら、設定に沿って一貫した世界を作る。
+- 日本語で書く。${DATE_RULE}
+
+設定:
+- 時代・舞台: ${st.era}
+- プレイヤー勢力: ${st.faction}
+- 難易度: ${st.diff||"標準"}
+- モード: ${st.mode==="crucible" ? "クルーシブル（世界秩序そのものがプレイヤー勢力を潰しにくる生存モード。周辺勢力は最初から警戒的で、包囲網が組まれやすい）" : "標準"}
+- 追加の希望: ${st.notes || "なし"}
+${st.mapId ? `- 初期の領国配置（区画名）: ${territoryText({map:Object.fromEntries(MAPS[st.mapId].map(t=>[t.name,t.owner]))})}\n` : ""}${st.roster ? `- 各勢力の背景（史実に基づく固定設定。当主・体制・関係はこれに従う。諸説ありの箇所は断定しない）:\n${loreText(Object.keys(FACTION_LORE))}\n` : ""}${st.roster ? `- この時代の勢力一覧（勢力名:領国数）: ${st.roster}\n  ※rivals はこの一覧の勢力名をそのまま使い、プレイヤー勢力の隣国・主要な脅威・交易相手を中心に選ぶ。\n` : ""}
+指標(metrics)について: 国力を一律の項目で測らず、その勢力の性格に合った固有の指標を3〜5個作る（例: 甲賀衆なら「甲賀忍び衆動員数」「郡中惣結束度」「対伊賀協調度」、商人なら「蓄財(貫)」など）。規模は領国数・史実に見合った値にする。
+内部の相手(internal)について: プレイヤーが書状を送れる家中・配下の組織・取次役などを2〜4つ作る。忍び衆・奉行衆・水軍のような複数人の組織は capacity を2以上にする。
+
+JSONのみで出力:
+{"title":"キャンペーン名(15字以内)","date":"開始日","nation":{"name":"プレイヤー勢力名","leader":"当主・指導者名","summary":"現状(120字)","assets":["主要拠点・資源・強みなど最大5項目"]},
+"metrics":[${METRIC_FMT}],
+"internal":[{"name":"相手の名前","role":"役割(40字)","members":"規模の目安(例: 下忍百名余)","capacity":同時に動かせる任務の数(個人なら1、組織なら規模に応じて2〜4)}],
+"rivals":[${RIVAL_FMT}]  ※重要な勢力を5〜8,
+${PAPER_FMT}  ※開幕号として世界情勢を伝える,
+"opening":{"narrative":"開幕の語り。時代の情勢とプレイヤー勢力の置かれた状況を物語として(250字)","standing":"あなたの立場。プレイヤー勢力の強み・弱み・周囲の力学・まだ何も決まっていないこと(250字)","powers":[{"name":"有力勢力名","text":"その勢力の現状と狙い(80字)"}]}  ※powersは4〜6,
+${st.mapId ? '"provinces":{"区画名":[石高(万石・整数),人口(万人・整数),動員兵力(千人・整数),安定(0〜100)]}  ※territoryにある全区画について。史実の規模感に沿った推定値,\n' : ""}"chronicle":"開始時点の状況要約(150字)"}`;
+}
+
+function metricsText(c){ return c.metrics.map(m=>`${m.name}=${m.value}${m.unit||""}`).join(" / "); }
+function worldView(c){
+  return {
+    date:c.date, turn:c.turn, mode:c.setup.mode, era:c.setup.era,
+    nation:c.nation, metrics:c.metrics.map(m=>({name:m.name,value:m.value,unit:m.unit})),
+    plans:c.plans, internal:c.internal.map(x=>({...x, capacity:capOf(x)})), others:c.others||[], rivals:c.rivals, promises:c.promises,
+    territory: c.map ? territoryText(c) : undefined,
+    my_provinces: c.prov ? Object.fromEntries(Object.entries(c.prov).filter(([k])=>isMine(c,c.map[k]))) : undefined
+  };
+}
+function stopText(c){ return c.stopCond ? `\n進行を止める条件: 「${c.stopCond}」。この条件に当たる出来事が起きたら、期間の途中でもその日でターンを終え、stop_reason に理由を書く。` : ""; }
+function periodText(len){
+  return len==="自動" ? "自動（命令の内容に見合った期間を1日〜1か月の範囲で決める。急ぎの命令や危機の最中なら短く、準備の要る命令なら長く）" : len;
+}
+function turnPrompt(c, orders){
+  const chron = c.chronicle.slice(-24).map(x=>`第${x.turn}ターン(${x.date}): ${x.summary}`).join("\n");
+  const dipLine = (x)=>`[${x.with}${x.from?"・"+x.from:""}] ${x.role==="user"?"自勢力→":"相手→"} ${x.content}${x.answer?`（回答: ${x.answer}）`:""}${x.exec?`（引き受けた実行: ${x.exec}）`:""}`;
+  const dip = c.dipLog.filter(x=>x.turn===c.turn).map(dipLine).join("\n");
+  const cut = (t,n)=>{ t=String(t).replace(/\s+/g," "); return t.length>n?t.slice(0,n)+"…":t; };
+  const dipPrev = c.dipLog.filter(x=>x.turn<c.turn && x.turn>=c.turn-3).slice(-24).map(x=>`(ターン${x.turn}) `+cut(dipLine(x),140)).join("\n");
+  const loreNames = [loreKey(c.setup.faction), ...c.rivals.map(r=>loreKey(r.name)), ...(c.others||[]).map(o=>loreKey(o.name))].filter(Boolean);
+  return `あなたはテキスト型グランドストラテジーゲームの「裁定役」兼「世界の語り手」です。
+
+規則:
+1. プレイヤーの命令は自由記述で、番号順が優先順位。時間や資源が競合したら上位を優先する。命令に書かれた条件（「〜はしない」など）は必ず守らせる。担当が書かれていなければ最も適切な部署・家臣が担当する。各命令を、プレイヤー勢力の指標・地理・同盟関係・時代の技術水準・このターンの期間から見て、現実に実行できるかで裁定し「完全成功」「部分的成功」「失敗」のいずれかにする。プレイヤーに都合よく成功させない。時代錯誤・非現実的・期間内に終わらない命令は失敗か部分的成功。命令が複数あれば個別に裁定する。
+2. 数ターンかかる命令や書状での指示は plans に登録し、毎ターン進捗(0〜100)と完了見込み日を更新する。完了したら status を「完了」、潰れたら「頓挫」にして返す（次のターンからは返さなくてよい）。
+3. metrics は命令と出来事に応じて現実的に動かす。全指標を毎回返す。状況が変われば指標を1つ追加してよい（最大6）。
+4. ライバル勢力は hidden_agenda に沿って自律的に動く。約束(promises)や書状の内容を覚えており、破られれば態度を悪化させる。書状で相手の回答が「合意」のものだけを promises に記録する（提案・条件付き・保留は約束ではない）。新しい勢力を加えても、滅んだ勢力を外してもよい。
+5. events はこのターン中に世界で起きた出来事を日付順に。プレイヤー以外の動きも含める。effects には指標の変化を書く（プレイヤー以外の勢力の指標でもよい）。
+6. incoming_messages は、他勢力や家中(internal)から自発的に届く書状。家中からの報告・具申、他勢力からの打診・抗議・依頼など、状況に応じて0〜4通。
+7. 新聞にはプレイヤーが知りえない秘密を書かない（噂として匂わせるのは可）。
+8. 史実の人物・地名・技術は尊重するが、プレイヤーの行動で歴史は分岐してよい。
+8a. 自由な命令ほど、その時代・世界で自然に起こりうる具体的な手段と経緯に翻訳して描く（例: 暗殺の命令なら、失火や自害に見せかける工作として描き、周囲がどう受け止めたかまで書く）。結果は不自然にせず、関係者の反応・疑念・後始末まで世界に残す。
+8b. 家中が書状で引き受けた実行（「引き受けた実行」）は命令一覧にも入っている。他勢力と交わした合意も、命令と同じく実行・裁定の対象にする。返答で相手が引き受けたことは、その者の力量の範囲で実行された結果を events に書く。
+8e. 家中(internal)の者同士は主君の方針を共有している。書状で引き受けた策のために、他の家臣・組織と自ら連携して動いてよい（例: 取次役が忍び衆と組んで噂を流す）。連携した場合は events にそれが分かるように書く。
+8d. 「〜への任務：」で始まる命令は、その組織(internal)に割り当てた任務。組織は capacity の数まで任務を同時に並行でこなせる。進行中の任務(plans の actor が同じもの)と合わせて capacity を超えると人手が分散し、各任務の成功率と速度が下がる（超えた分だけ部分的成功・失敗が増える）。数ターンかかる任務は actor を付けて plans に登録する。
+8c. events の effects には、プレイヤー以外の勢力の変化も書いてよい。その場合の指標名は必ず日本語（「安定」「動員兵力」「石高」「人口」「財力」など）で書き、英語や英字（STABILITY・LEVY 等）は使わない。
+8g. 謀略・偽装・密約・調略など、プレイヤー側が仕掛けたことの結果は、events に「表向き（世間に見えた形。噂や誤解を含む）」と「真相（実際に起きたこと）」を別々の出来事として書き、真相の方には "secret":true を付ける。他者が仕掛けた謀略の真相はプレイヤーには分からないので書かない（不審な点として匂わせるのは可）。年代記は新聞であり、基本は世間に見えた形で報じる。
+8h. 前のターンまでの書状で交わした約束・引き受けた策も生きている。今回の命令・書状・過去の書状が同じ事件に関わるなら、矛盾なく一本の筋として噛み合わせる（例: 三好と組んだ偽の兵糧庫の策に、畠山が乗せられて伏兵に遭う）。
+8i. 約束(promises)には期限や条件(due)を持たせる。期限が来たら、約束した側が自ら履行する（報奨金を送る、兵を出す等）か、破ってその結果が出る。相手側からの履行は incoming_messages や events に書く。
+8j. 書状で主君が仮定・質問・相談をしただけ（「もしも」「〜か？」）なら、それは行動ではない。実行の対象にしない。
+8f. 「世界が覚えていること」は何ターン前のことでも有効。登場人物や勢力はそれを踏まえてふるまう（昔の約束を持ち出す、恨みを忘れない等）。
+9. プレイヤー勢力が滅亡・崩壊した場合のみ game_over に理由を書く。それ以外は null。
+${c.map ? "10. territory は区画ごとの支配者。区画が移れば、その区画の石高・動員兵力は新しい支配者のものになる（プレイヤー勢力の指標にも反映する）。合戦・調略・降伏などで支配が実際に移った区画だけを territory_changes に書く。区画名は territory にある名前だけを使う。\n" : ""}${c.setup.mode==="crucible" ? "11. クルーシブルモード: 世界秩序は常にプレイヤー勢力を最大の脅威とみなし、包囲・制裁・干渉を段階的に強める。\n" : ""}${DIFF_RULE[c.setup.diff||"標準"]}
+${DATE_RULE}
+
+このターンの期間: ${periodText(c.turnLen)}${stopText(c)}
+
+現在の世界状態(JSON):
+${JSON.stringify(worldView(c))}
+
+世界が覚えていること（長期記憶。古くても有効。約束・恨み・借り・秘密・人物の因縁など）:
+${memText(c)}
+
+主な勢力の背景（史実に基づく固定設定。当主・体制・関係はこれに従う）:
+${loreText([...new Set(loreNames)]) || "（なし）"}
+
+これまでの年代記:
+${chron || "（なし）"}
+
+このターンの書状のやりとり:
+${dip || "（なし）"}
+
+直近のターンの書状（要点。約束や引き受けた策は今も生きている）:
+${dipPrev || "（なし）"}
+
+プレイヤーの命令:
+"""
+${orders}
+"""
+
+JSONのみで出力:
+{"days_elapsed":経過日数(整数),"new_date":"ターン終了時の日付",
+"verdicts":[{"no":命令番号,"order":"命令の要約(30字)","actor":"担当","goal":"目標","constraint":"条件(なければ空)","result":"完全成功|部分的成功|失敗","reason":"裁定の根拠。一部実行・失敗なら何ができて何ができなかったか(100字)"}]  ※命令1つにつき1件、番号順,
+"progressed":["このターンで進んだこと(30字)"],"pending":["まだ決まっていないこと(30字)"],
+"metrics":[${METRIC_FMT}],
+"plans":[{"title":"計画名(30字)","actor":"担当(internal の名前ならそのまま)","progress":0〜100,"eta":"完了見込み日","status":"進行中|完了|頓挫"}],
+"nation_summary":"プレイヤー勢力の現状(120字)","assets":["最大5項目"],
+"events":[{"category":"戦争|政治|外交|経済|社会|諜報|不穏|宗教|災害","date":"日付","text":"出来事(80字)","secret":真相の記事ならtrue,${c.map ? '"province":"起きた場所の区画名(territoryにある名前。なければ空)",' : ""}"effects":[{"target":"勢力名","metric":"指標名","delta":数値}]}]  ※4〜8件,
+"incoming_messages":[{"from":"rivals か internal か others の名前","sender":"実際の差出人の名前（肩書）","text":"書状本文(150字)"}],
+"rivals":[更新後の全勢力。各要素は ${RIVAL_FMT} に "last_action":"今ターンの行動(40字)" を加えた形],
+"promises":[{"with":"勢力名","text":"約束内容","due":"期限・条件(なければ空)","status":"有効|履行|破棄"}],
+"newspaper":{"masthead":"新聞名（時代と土地にふさわしい名称。前号と同じでよい）","headline":"この号の一面見出し(30字以内)","lead":"リード文(100字前後)"},
+"chronicle":"このターンの要約(150字)",
+"memory_add":[{"with":"関係する勢力・人物（なければ空）","fact":"長く覚えておくべき事実(60字)"}]  ※このターンに生まれた約束・裏切り・恩・恨み・秘密・重要人物の生死など0〜3件。すでに記憶にあることは書かない,
+"memory_resolve":["もう意味を失った記憶の fact の書き出し10字（約束が果たされた等）"],
+${c.stopCond ? '"stop_reason":"条件に当たって止めた場合はその理由。当たらなければ空",\n' : ""}${c.map ? '"territory_changes":[{"province":"区画名","to":"新しい支配勢力名"}],\n' : ""}${c.prov ? '"province_updates":{"区画名":[石高,人口,動員兵力,安定]}  ※戦乱・開発などで実際に変わった区画だけ。なければ{},\n' : ""}"game_over":null}`;
+}
+
+function capOf(it){ if (it.capacity) return it.capacity; return /衆|組|党|団|組織|評定|奉行|水軍|一揆|家中|方$/.test(it.name+it.role) ? 3 : 1; }
+function missionsFor(c, name){ return c.queue.filter(o=>c.qsrc && c.qsrc[o]==="任務" && o.startsWith(name+"への任務：")); }
+function activeFor(c, name){ return c.plans.filter(p=>p.actor===name); }
+function findContact(c, name){
+  const r = c.rivals.find(x=>x.name===name); if (r) return {kind:"foreign", r};
+  const i = c.internal.find(x=>x.name===name); if (i) return {kind:"internal", i};
+  const o = (c.others||[]).find(x=>x.name===name); if (o) return {kind:"other", o};
+  if (name===c.nation.name+"（家中全体）") return {kind:"internal", i:{name, role:"評定・重臣一同", capacity:1}};
+  return null;
+}
+function memText(c, who){
+  const m = (c.memory||[]).filter(x=>!who || !x.with || x.with===who || (x.with||"").includes(who) || who.includes(x.with||"\u0000"));
+  return m.length ? m.map(x=>`・(ターン${x.turn}${x.with?"・"+x.with:""}) ${x.fact}`).join("\n") : "（なし）";
+}
+function hearsay(c, name){
+  const cut = (t,n)=>{ t=String(t).replace(/\s+/g," "); return t.length>n ? t.slice(0,n)+"…" : t; };
+  const recent = c.dipLog.filter(x=>x.with!==name && x.turn>=c.turn-2).slice(-10);
+  const lines = recent.map(x=>{
+    const ct = findContact(c, x.with), where = ct && ct.kind==="internal" ? "家中で" : "外交の場で";
+    return x.role==="user" ? `・${where}主君が${x.with}に: ${cut(x.content,70)}` : `・${x.with}${x.from?"（"+x.from+"）":""}の返答: ${cut(x.content,60)}${x.answer?`［${x.answer}］`:""}`;
+  });
+  const q = c.queue.map(o=>`・今回の命令案: ${cut(o,60)}`);
+  const pl = c.plans.map(p=>`・進行中の計画: ${p.title}${p.actor?`（担当 ${p.actor}）`:""} ${p.progress}%`);
+  const all = [...lines, ...q, ...pl];
+  return all.length ? all.join("\n") : "（特になし）";
+}
+function internalStance(c){
+  const d = c.setup.diff||"標準";
+  if (d==="苛烈") return "主君に忠実だが言いなりではない。現場の実情・懸念・必要な資源を率直に伝える。できないことは「できない」と言う。指示が無謀・逆効果・時期尚早なら、具体的な理由を挙げて諫め、今できるより良い代案を示す。指示を引き受けるなら、どう実行するかの段取りを具体的に述べる。";
+  if (d==="無制約" || d==="自由") return "主君の指示はすべて引き受け、どう実行するかの段取りを具体的に述べる。懸念があっても一言添える程度にとどめる。";
+  return "主君の指示は、よほど理不尽・無理難題・筋違いでない限り、まず引き受けて実行に移す（「承知いたしました」から入り、誰がどう動くかの段取りを具体的に述べる）。成否や代償を前もって予告しない（結果は世の動き次第で、年代記で明らかになる）。懸念は一言添える程度にとどめ、止めない。家の存亡に関わる危険・味方の壊滅・取り返しのつかない露見を招くとき、または明らかに不可能なときだけ、理由を挙げて諫め、代案を示す。太鼓持ちにはならず、自分の立場・人柄・現場の事情は言葉ににじませる。";
+}
+function foreignStance(c){
+  const d = c.setup.diff||"標準";
+  if (d==="苛烈") return "自勢力の利益と性格に忠実に。安易に譲歩しない。相手の思惑を疑い、裏があると思えば探りを入れる。";
+  return "自勢力の利益と性格に忠実に。ただし門前払いはせず、利のある話・筋の通る話には乗る。不利な話や過大な要求には、断るより条件を付けて交渉の余地を残す（はっきり断るのは自家に明確な害があるときだけ）。関係の良い相手には情でも応える（気遣いには礼、被害には見舞い、共闘の申し出には心強いと返す）。裏がありそうなら探りを入れる。";
+}
+function dipTurns(c, name){
+  const ct = findContact(c, name);
+  let rules;
+  if (ct.kind==="foreign"){
+    const rival = ct.r;
+    rules = `あなたは「${rival.name}」の当主「${rival.leader||"代表"}」として、「${c.nation.name}」から届いた書状に返答します。
+
+あなたの家の背景（史実に基づく固定設定）:
+${loreText([loreKey(rival.name)].filter(Boolean)) || "（なし）"}
+
+あなたの立場:
+- 相手への態度: ${rival.attitude}（-100敵対〜100同盟）、関係: ${rival.stance}
+- 公の評判: ${rival.public_note}
+- 本音・秘密（相手には簡単に明かさない）: ${rival.hidden_agenda}
+- 最近の行動: ${rival.last_action||"不明"}
+- 有効な約束: ${c.promises.filter(p=>p.with===rival.name && p.status==="有効").map(p=>p.text).join(" / ") || "なし"}
+
+返答の規則: ${foreignStance(c)}話題に応じて、取次役・当主・宿老・前線の将など最もふさわしい人物が答える（当主への気遣いや家の大事は当主本人、戦況は前線の将、日々の連絡は取次役）。合意する場合は条件を具体的に示す。
+最初の行に「【差出人】名前（肩書）」を書く（その勢力・組織の中で、この件に応じるのに最もふさわしい人物。当主とは限らない）。
+最後の行に、相手の提案に対するあなたの態度を必ず「【回答】合意」「【回答】条件付き」「【回答】保留」「【回答】拒否」「【回答】なし」（提案がない場合）のどれかで書く。条件付きの場合はその条件を本文に明記する。`;
+  } else if (ct.kind==="other"){
+    const ot = ct.o;
+    rules = `${loreKey(ot.name) ? "あなたの背景（史実に基づく固定設定）:\n"+loreText([loreKey(ot.name)])+"\n\n" : ""}あなたは「${ot.name}」${ot.role?`（${ot.role}）`:""}として、「${c.nation.name}」から届いた書状に返答します。この世界と時代に実在しうる人物・組織として、自分の立場と利害に忠実にふるまう。相手との関係はまだ浅いので慎重に、${(c.setup.diff||"標準")==="苛烈" ? "安易に譲歩せず、" : "しかし門前払いはせず、利のある話には乗り、"}用件には具体的に答える。
+最初の行に「【差出人】名前（肩書）」を書く。
+最後の行に、相手の提案に対するあなたの態度を必ず「【回答】合意」「【回答】条件付き」「【回答】保留」「【回答】拒否」「【回答】なし」のどれかで書く。`;
+  } else {
+    const it = ct.i;
+    rules = `あなたは「${c.nation.name}」に属する「${it.name}」（役割: ${it.role}）として、主君「${c.nation.leader}」からの書状・指示に返答します。
+
+自家の背景（史実に基づく固定設定）:
+${loreText([loreKey(c.setup.faction)].filter(Boolean)) || "（なし）"}
+
+返答の規則: 主君の言葉が仮定・質問・相談（「もしも」「〜か？」）なら、行動せずに相談として答える（立場ゆえの事情や障害まで踏み込む）。${internalStance(c)}結果を勝手に確定させず、報告・具申・見込みとして書く。
+最初の行に「【差出人】名前（肩書）」を書く（この組織の中で応じるのに最もふさわしい人物）。
+主君の指示を引き受けて実際に動くときだけ、最後の行に「【実行】担当（誰が）｜実行する内容と条件（60字）」を書く。相談・質問への答えや、断る・保留するときは書かない。
+
+家中で伝え聞いていること（報告や噂で耳に入った程度。細部や正確な文言までは知らない）:
+${hearsay(c, name)}
+これらを踏まえ、主君の方針に沿って自分から動く。他の家臣・組織と連携した方が良ければそう申し出る（例: 「忍び衆とも連携し、足がつかぬよう…」）。ただし伝え聞いたことを、見てきたように詳しく語らない。`;
+  }
+  rules += `
+世界状況: ${c.date}。${c.setup.era}。${c.nation.name}の現状: ${c.nation.summary}　指標: ${metricsText(c)}
+この相手に関して世界が覚えていること（古くても有効。相手もこれを覚えている）:
+${memText(c, name)}
+時代と立場にふさわしい文体で、本文を250字以内で書く。${NUM_RULE}`;
+  const hist = c.dipLog.filter(x=>x.with===name).slice(-14).map(x=>({role:x.role, content:(x.role==="user"?`【${c.nation.name}より】`:"")+x.content}));
+  if (hist.length && hist[hist.length-1].role!=="user") hist.push({role:"user", content:"（続けて返答せよ）"});
+  return [{role:"user", content:rules}, ...hist];
+}
+
+/* ---------- ゲーム処理 ---------- */
+function normRival(r){
+  return {name:String(r.name||"不明勢力"), leader:String(r.leader||""), attitude:clamp(Math.round(num(r.attitude)),-100,100),
+    stance:String(r.stance||"中立"), public_note:String(r.public_note||""), hidden_agenda:String(r.hidden_agenda||""), last_action:String(r.last_action||"")};
+}
+function normPaper(p){
+  p = p||{};
+  return {masthead:String(p.masthead||"世界日報"), headline:String(p.headline||"本日の世界"), lead:String(p.lead||""),
+    articles:Array.isArray(p.articles)?p.articles.map(a=>({title:String(a.title||""),body:String(a.body||"")})):[],
+    briefs:Array.isArray(p.briefs)?p.briefs.map(String):[]};
+}
+function normProv(c, obj){
+  const out = {};
+  for (const name of Object.keys(c.map)){
+    const v = obj[name]; if (!Array.isArray(v)) continue;
+    out[name] = [Math.max(0,Math.round(num(v[0]))), Math.max(0,Math.round(num(v[1]))), Math.max(0,Math.round(num(v[2]))), clamp(Math.round(num(v[3],50)),0,100)];
+  }
+  return out;
+}
+function normPlans(a){ return (Array.isArray(a)?a:[]).map(p=>({title:String(p.title||""), actor:String(p.actor||""), progress:clamp(Math.round(num(p.progress)),0,100), eta:String(p.eta||""), status:String(p.status||"進行中")})).filter(p=>p.title).slice(0,10); }
+const METRIC_JA = {stability:"安定", levy:"動員兵力", manpower:"動員兵力", troops:"兵力", army:"兵力", kokudaka:"石高", koku:"石高", population:"人口", pop:"人口", wealth:"財力", treasury:"財力", gold:"財力", economy:"経済力", prestige:"威信", legitimacy:"正統性", morale:"士気", unrest:"不穏", influence:"影響力", cohesion:"結束", food:"兵糧", trade:"交易"};
+function jaMetric(n){ const k = String(n||"").trim(); if (!/[A-Za-z]/.test(k)) return k; const key = k.toLowerCase().replace(/[^a-z]/g,""); return METRIC_JA[key] || k; }
+function fmtNum(d){ const a = Math.abs(d); const v = a>=10000 ? (Math.round(a/1000)/10)+"万" : a.toLocaleString(); return (d>0?"+":d<0?"-":"")+v; }
+function normEvents(a){ return (Array.isArray(a)?a:[]).map(e=>({category:String(e.category||"政治"), date:String(e.date||""), text:String(e.text||""),
+  province:String(e.province||""), secret:!!e.secret, effects:(Array.isArray(e.effects)?e.effects:[]).map(f=>({target:String(f.target||""), metric:jaMetric(f.metric), delta:num(f.delta)})).filter(f=>f.metric && f.delta)})).filter(e=>e.text).slice(0,8); }
+function applyMetrics(c, list){
+  const deltas = [];
+  if (!Array.isArray(list)) return deltas;
+  for (const m of list){
+    const name = jaMetric(m && m.name); if (!name) continue;
+    const v = num(m.value, NaN); if (!Number.isFinite(v)) continue;
+    let cur = c.metrics.find(x=>x.name===name);
+    if (!cur){ if (c.metrics.length>=6) continue; cur = {name, value:v, unit:String(m.unit||""), hist:[]}; c.metrics.push(cur); deltas.push({name, delta:null, value:v}); }
+    else { const d = Math.round((v-cur.value)*10)/10; if (d) deltas.push({name, delta:d, value:v}); cur.value = v; if (m.unit!=null) cur.unit = String(m.unit); }
+  }
+  for (const m of c.metrics){ m.hist.push([c.turn, m.value]); if (m.hist.length>40) m.hist.splice(0, m.hist.length-40); }
+  return deltas;
+}
+// 古いセーブを新しい形に揃える
+function migrate(c){
+  if (!c.metrics){
+    const st = (c.nation && c.nation.stats) || {};
+    c.metrics = STATS.filter(k=>k in st).map(k=>({name:k, value:st[k], unit:"", hist:[[c.turn-1, st[k]]]}));
+  }
+  c.internal ||= []; c.memory ||= []; c.pins ||= [];
+  if (!c.advThreads){ c.advThreads = (c.advLog&&c.advLog.length) ? [{id:"a0", title:(c.advLog[0].content||"相談").slice(0,40), log:c.advLog, updated:Date.now()}] : []; } c.others ||= []; c.plansDone ||= []; c.plans ||= []; c.advLog ||= []; c.queue ||= []; c.elapsed ||= 0;
+  c.turnLen ||= "自動";
+  return c;
+}
+
+async function startCampaign(){
+  const st = S.setup;
+  const preset = PRESETS.find(p=>p.id===st.preset);
+  const era = st.preset==="custom" ? st.era.trim() : preset.era;
+  if (!era || !st.faction.trim()){ S.err = "時代と勢力を入力してください。"; render(); return; }
+  S.err = "";
+  const setup = {era, faction:st.faction.trim(), mode:st.mode, diff:st.diff||"標準", unit:st.unit, notes:st.notes.trim(), mapId: MAPS[preset.id] ? preset.id : null, roster: preset.roster ? preset.roster.map(f=>f.name+":"+f.prov).join("、") : ""};
+  if (preset.roster){ const f = preset.roster.find(x=>x.name===setup.faction); if (f) setup.faction += `（${f.prov}国）`; }
+  try {
+    const r = await askJSON(initPrompt(setup), "世界を生成中");
+    const date = String(r.date||"開始");
+    const c = {
+      id:uidGen(), title:String(r.title||setup.faction), created:Date.now(), updated:Date.now(),
+      setup, date, turn:1, elapsed:0, turnLen: st.unit || "自動",
+      nation:{name:String(r?.nation?.name||setup.faction), leader:String(r?.nation?.leader||""), summary:String(r?.nation?.summary||""), assets:Array.isArray(r?.nation?.assets)?r.nation.assets.map(String).slice(0,5):[]},
+      metrics:[], internal:(Array.isArray(r.internal)?r.internal:[]).map(x=>({name:String(x.name||""), role:String(x.role||""), members:String(x.members||""), capacity:clamp(Math.round(num(x.capacity,1)),1,5)})).filter(x=>x.name).slice(0,5),
+      plans:[], advLog:[], queue:[],
+      rivals:(Array.isArray(r.rivals)?r.rivals:[]).map(normRival),
+      promises:[], chronicle:[{turn:0, date, summary:String(r.chronicle||"")}],
+      papers:[], dipLog:[], over:null,
+      map: setup.mapId ? Object.fromEntries(MAPS[setup.mapId].map(t=>[t.name,t.owner])) : null
+    };
+    c.turn = 0; applyMetrics(c, r.metrics); c.turn = 1;
+    if (!c.metrics.length) c.metrics = [{name:"勢力", value:50, unit:"", hist:[[0,50]]}];
+    const op = r.opening || {};
+    const opening = {narrative:String(op.narrative||""), standing:String(op.standing||""), powers:(Array.isArray(op.powers)?op.powers:[]).map(x=>({name:String(x.name||""), text:String(x.text||"")})).filter(x=>x.text).slice(0,8)};
+    c.papers.push({turn:0, date, ...normPaper(r.newspaper), verdicts:[], mdeltas:[], events:[], moves:[], opening});
+    if (c.map && r.provinces && typeof r.provinces==="object") c.prov = normProv(c, r.provinces);
+    S.camps.unshift(c); S.cur = c; S.view="game"; S.tab="paper"; S.paperIdx=null; S.draftOrders="";
+    await saveCamp(c);
+  } catch(e){ if (e.code!=="cancelled") S.err = errMsg(e); }
+  render();
+}
+
+async function endTurn(){
+  const c = S.cur;
+  const all = [...c.queue, S.draftOrders.trim()].filter(Boolean);
+  if (!all.length){ S.err = "命令を書いてください。"; render(); return; }
+  S.err = "";
+  const orders = all.map((o,i)=>`${i+1}. ${o}`).join("\n");
+  try {
+    const r = await askJSON(turnPrompt(c, orders), "裁定中", "complex");
+    const mdeltas = applyMetrics(c, r.metrics);
+    if (r.nation_summary) c.nation.summary = String(r.nation_summary);
+    if (Array.isArray(r.assets)) c.nation.assets = r.assets.map(String).slice(0,5);
+    if (Array.isArray(r.rivals) && r.rivals.length) c.rivals = r.rivals.map(normRival);
+    if (Array.isArray(r.promises)) c.promises = r.promises.map(p=>({with:String(p.with||""), text:String(p.text||""), due:String(p.due||""), status:String(p.status||"有効")})).slice(-30);
+    if (Array.isArray(r.plans)){
+      const np = normPlans(r.plans);
+      c.plansDone ||= [];
+      for (const pl of np) if (pl.status!=="進行中" && !c.plansDone.some(d=>d.title===pl.title)) c.plansDone.push({...pl, turn:c.turn});
+      c.plans = np.filter(pl=>pl.status==="進行中");
+    }
+    const moves = [];
+    if (c.map && Array.isArray(r.territory_changes)) for (const t of r.territory_changes){
+      const pv = String(t && t.province || ""), to = String(t && t.to || "").trim();
+      if (pv in c.map && to && c.map[pv] !== to){ const v = c.prov && c.prov[pv]; moves.push({province:pv, from:c.map[pv], to, koku: v ? v[0] : null, levy: v ? v[2] : null}); c.map[pv] = to; }
+    }
+    if (c.prov && r.province_updates && typeof r.province_updates==="object"){ const up = normProv(c, r.province_updates); for (const k in up) c.prov[k] = up[k]; }
+    const verdicts = (Array.isArray(r.verdicts)?r.verdicts:[]).map(v=>({no:num(v.no,0), order:String(v.order||""), actor:String(v.actor||""), goal:String(v.goal||""), constraint:String(v.constraint||""), result:String(v.result||"部分的成功"), reason:String(v.reason||"")}));
+    const days = clamp(Math.round(num(r.days_elapsed, 7)), 0, 3660);
+    const newDate = String(r.new_date || c.date);
+    c.elapsed += days;
+    const strs = (a)=>(Array.isArray(a)?a:[]).map(String).filter(Boolean).slice(0,6);
+    c.papers.push({turn:c.turn, date:newDate, days, ...normPaper(r.newspaper), verdicts, mdeltas, orders:all, moves, events:normEvents(r.events), progressed:strs(r.progressed), pending:strs(r.pending), stopNote:String(r.stop_reason||"")});
+    // 自発的に届いた書状
+    if (Array.isArray(r.incoming_messages)) for (const m of r.incoming_messages.slice(0,5)){
+      const from = String(m && m.from || ""), text = String(m && m.text || "").trim();
+      if (text && findContact(c, from)) c.dipLog.push({turn:c.turn+1, with:from, role:"assistant", content:text, unread:true, incoming:true, from: m.sender ? String(m.sender) : null});
+    }
+    c.chronicle.push({turn:c.turn, date:c.date, summary:String(r.chronicle||"")});
+    c.memory ||= [];
+    if (Array.isArray(r.memory_resolve)) for (const k of r.memory_resolve){ const key=String(k||"").slice(0,10); if (key) c.memory = c.memory.filter(x=>!x.fact.startsWith(key)); }
+    if (Array.isArray(r.memory_add)) for (const m of r.memory_add.slice(0,4)){ const fact=String(m&&m.fact||"").trim(); if (fact && !c.memory.some(x=>x.fact===fact)) c.memory.push({turn:c.turn, with:String(m.with||""), fact}); }
+    if (c.memory.length>80) c.memory.splice(0, c.memory.length-80);
+    if (r.game_over) c.over = String(r.game_over);
+    c.date = newDate;
+    c.turn += 1; c.queue = []; c.qsrc = {}; c.stopCond = "";
+    S.draftOrders = ""; S.tab = "paper"; S.paperIdx = null;
+    await saveCamp(c);
+  } catch(e){ if (e.code!=="cancelled") S.err = errMsg(e); }
+  render();
+}
+
+async function streamText(turns, label){
+  ctl = new AbortController();
+  startBusy(label);
+  try {
+    const {text} = await S.sample(turns, {signal:ctl.signal, cache:false, modelTier:"default",
+      onText:({text})=>{ if(S.busy){ S.busy.chars=text.length; const el=document.getElementById("busyt"); if(el) el.textContent=busyText(); } }});
+    return text.trim();
+  } finally { stopBusy(); }
+}
+async function sendOne(c, name, text, label){
+  c.dipLog.push({turn:c.turn, with:name, role:"user", content:text});
+  try {
+    const reply = await streamText(dipTurns(c, name), label || name+"が返書を準備中");
+    const mm = reply.match(/【回答】\s*(合意|条件付き|保留|拒否|なし)/);
+    const fm = reply.match(/【差出人】\s*([^\n]+)/);
+    const xm = reply.match(/【実行】\s*([^\n]+)/);
+    const body = reply.replace(/\n?【実行】[^\n]*/g, "").replace(/\n?【回答】.*$/s, "").replace(/【差出人】[^\n]*\n?/, "").trim() || reply;
+    const exec = xm ? xm[1].replace(/\s*[｜|]\s*/, "が、").trim() : null;
+    c.dipLog.push({turn:c.turn, with:name, role:"assistant", content:body, answer: mm ? mm[1] : null, from: fm ? fm[1].trim() : null, exec});
+    if (exec && !c.queue.includes(exec)){ c.queue.push(exec); (c.qsrc ||= {})[exec] = name; }
+    return true;
+  } catch(e){ c.dipLog.pop(); throw e; }
+}
+async function sendMulti(){
+  const c = S.cur, cp = S.compose, text = (cp.text||"").trim();
+  if (!cp.sel.length || !text) return;
+  if (!S.sample){ S.err = ERR.not_granted; render(); return; }
+  S.err = "";
+  for (const n of cp.sel) if (!findContact(c, n)) (c.others ||= []).push({name:n, role: allFactions(c).includes(n) ? "勢力" : ""});
+  const done = [];
+  for (let i=0;i<cp.sel.length;i++){
+    const n = cp.sel[i];
+    try { await sendOne(c, n, text, `${n}が返書を準備中（${i+1}/${cp.sel.length}）`); done.push(n); }
+    catch(e){ if (e.code!=="cancelled") S.err = `${n}への送付で止まりました: `+errMsg(e); break; }
+  }
+  await saveCamp(c);
+  if (done.length===cp.sel.length){ S.dipWith = cp.sel.length===1 ? cp.sel[0] : null; S.compose = null; S.toBottom = !!S.dipWith; }
+  else cp.sel = cp.sel.filter(n=>!done.includes(n));
+  render(); if(!S.toBottom) window.scrollTo(0,0);
+}
+async function sendDip(){
+  const c = S.cur, name = S.dipWith, text = S.draftMsg.trim();
+  if (!findContact(c, name) || !text) return;
+  if (!S.sample){ S.err = ERR.not_granted; render(); return; }
+  S.err = "";
+  c.dipLog.push({turn:c.turn, with:name, role:"user", content:text});
+  S.draftMsg = ""; S.toBottom = true;
+  try {
+    const reply = await streamText(dipTurns(c, name), name+"が返書を準備中");
+    const mm = reply.match(/【回答】\s*(合意|条件付き|保留|拒否|なし)/);
+    const fm = reply.match(/【差出人】\s*([^\n]+)/);
+    const xm = reply.match(/【実行】\s*([^\n]+)/);
+    const body = reply.replace(/\n?【実行】[^\n]*/g, "").replace(/\n?【回答】.*$/s, "").replace(/【差出人】[^\n]*\n?/, "").trim() || reply;
+    const exec = xm ? xm[1].replace(/\s*[｜|]\s*/, "が、").trim() : null;
+    c.dipLog.push({turn:c.turn, with:name, role:"assistant", content:body, answer: mm ? mm[1] : null, from: fm ? fm[1].trim() : null, exec});
+    if (exec && !c.queue.includes(exec)){ c.queue.push(exec); (c.qsrc ||= {})[exec] = name; }
+    await saveCamp(c);
+  } catch(e){
+    c.dipLog.pop(); S.draftMsg = text;
+    if (e.code!=="cancelled") S.err = errMsg(e);
+  }
+  render();
+}
+
+/* ---------- 描画 ---------- */
+const GUIDE = [
+  ["世界","あなたが決め、世界が応える","時代と勢力を選んで始めます。あなたの命令は家中が実行に移し、他の勢力もそれぞれの思惑で動きます。","まずは大切にしたいことを一つ決めましょう。迷ったら「顧問」に、動く前に何を知っておくべきか聞けます。"],
+  ["命令","方針を示し、判断の余地を残す","「誰に・何を達成してほしいか・守ってほしい条件」を書きます。1ターンに何件でも命令を追加でき、上にあるものほど優先されます。","例: 勘定奉行に、堺の商人と鉄砲の買い付けを交渉させる。値が千貫を超えるなら見送ること。　命令しても成功が約束されるわけではありません。力・時機・相手の出方で結果が変わります。"],
+  ["顧問","相談して考え、決めたら命じる","「顧問」タブで選択肢や前提を確かめられます。顧問が出した「命令案」は、ボタンで命令に追加できます。","提案・追加した命令・実際に終わった行動は、それぞれ別のものです。ターンを終える前に「命令」タブの一覧を確かめましょう。"],
+  ["書状","どの勢力にも譲れない思惑がある","「書状」タブか、地図で他勢力の土地を選んで「使節と対話」からやりとりできます。家中にも指示や報告を求められます。","提案しただけでは合意になりません。相手の回答が「合意」になったものだけが約束として記録されます。"],
+  ["時間","歴史を進める速さを選ぶ","「ターン終了」の上で期間を選べます。「自動」なら命令に合わせて決まります。「進行を止める条件」を書くと、その出来事が起きた時点でターンが止まります。","急ぐ交渉は短く、計画を進めたいときは長く。時間が経つほど計画は進みますが、思わぬ展開も起きやすくなります。"],
+  ["結果","結果を読み、次の一手を考える","出来事は「年代記」に残ります。「進んだこと」「まだ決まっていないこと」、指標と地図の変化、「国情」の計画を確かめましょう。","1ターンで計画が進んでも、完了するとは限りません。決断と結果が積み重なって、あなただけの歴史になります。"]
+];
+function guideView(){
+  const i = S.guide, g = GUIDE[i];
+  const w = h("div",{class:"stack guide"});
+  w.append(h("div",{class:"row gtabs"}, GUIDE.map((x,k)=>h("button",{class:"chip","aria-pressed":String(k===i),onclick:()=>{S.guide=k;render();}},`0${k+1} ${x[0]}`))));
+  w.append(h("div",{class:"eyebrow-g"},"国を導くために"), h("h2",{class:"gh"},g[1]), h("p",null,g[2]), h("div",{class:"gex"}, h("div",{class:"note"},"たとえば"), h("p",{style:"margin:4px 0 0"},g[3])));
+  w.append(h("div",{class:"row",style:"justify-content:space-between"},
+    h("span",{class:"note"},`6項目中${i+1}項目`),
+    h("span",{class:"row"},
+      h("button",{class:"btn ghost",disabled:i===0||null,onclick:()=>{S.guide=i-1;render();}},"戻る"),
+      i<GUIDE.length-1 ? h("button",{class:"btn",onclick:()=>{S.guide=i+1;render();}},"続ける →") : h("button",{class:"btn",onclick:()=>{S.guide=null;try{localStorage.setItem("ishiroku_guided","1");}catch(e){}render();}},"ゲームに戻る"))));
+  return w;
+}
+function render(){
+  const y = window.scrollY;
+  $app.replaceChildren();
+  $app.append(topBar());
+  if (S.guide!=null){ $app.append(guideView()); document.querySelector("nav.tabs")?.remove(); return; }
+  if (S.view==="home") $app.append(homeView());
+  else if (S.view==="new") $app.append(newView());
+  else if (S.view==="game" && S.cur) $app.append(gameView());
+  if (S.busy) $app.append(h("div",{class:"busy",role:"status"}, h("span",null,h("span",{class:"dot"}),h("span",{id:"busyt"},busyText())), h("button",{class:"btn ghost",onclick:()=>ctl&&ctl.abort()},"中止")));
+  if (S.err) $app.append(h("p",{class:"err",role:"alert"},S.err));
+  document.querySelector("nav.tabs")?.remove();
+  if (S.view==="game" && S.cur) document.body.append(tabBar());
+  window.scrollTo(0,y);
+  if (S.toBottom){ S.toBottom = false; setTimeout(()=>window.scrollTo(0, document.documentElement.scrollHeight), 0); }
+}
+function topBar(){
+  const right = S.view==="home" ? h("span",{class:"sub"}, S.storage==="cloud"?"セーブ: この端末内":S.storage==="local"?"セーブ: この端末のみ":"読込中…")
+    : h("button",{class:"linkbtn",onclick:()=>{ if(S.busy) return; S.view="home"; S.err=""; render(); }},"← 一覧");
+  const guideBtn = h("button",{class:"linkbtn",onclick:()=>{ S.guide = 0; render(); window.scrollTo(0,0); }},"遊び方");
+  return h("header",{class:"top"}, h("div",null,h("h1",null,"異史録"), h("div",{class:"sub"},"命令メニューのない歴史シミュレーション")), h("div",{class:"row",style:"gap:14px;flex-wrap:nowrap"},guideBtn,right));
+}
+
+function homeView(){
+  const w = h("div",{class:"stack"});
+  const aiReady = window.IshirokuAI && window.IshirokuAI.hasKey();
+  const aiCard = h("div",{class:"card"},
+    h("strong",null,"AI接続（Gemini 3.8 Flash）"),
+    h("p",{class:"note"},aiReady?"APIキー設定済み。無料枠の範囲で利用します。":"APIキー未設定です。無料枠を使うにはGoogle AI Studioでキーを作成してください。"),
+    h("div",{class:"row"},
+      h("button",{class:"btn",onclick:()=>{const value=prompt("Google AI Studioで作成したGemini APIキーを貼り付けてください。キーはこのブラウザの端末内に保存され、ゲームのセーブデータには含まれません。","");if(value===null)return;try{window.IshirokuAI.setKey(value.trim());S.err="";render();}catch(e){alert(e.message||"保存できませんでした");}}},aiReady?"APIキーを変更":"AI接続を設定"),
+      aiReady?h("button",{class:"btn ghost",onclick:()=>{if(confirm("この端末に保存したAPIキーを削除しますか？")){window.IshirokuAI.removeKey();render();}}},"キーを削除"):null,
+      h("a",{href:"https://aistudio.google.com/app/apikey",target:"_blank",rel:"noopener",class:"linkbtn"},"Google AI Studioでキーを作成 ↗")
+    ),
+    h("p",{class:"note"},"注意：無料枠には回数・トークン上限があります。上限に達しても有料へ自動移行しません。APIキーは公開・共有しないでください。無料枠では送信内容がサービス改善に使われる場合があります。")
+  );
+  w.append(aiCard);
+  if (S.ready && !S.sample) w.append(h("p",{class:"err"},"Gemini APIキーが未設定です。下の「AI接続を設定」から無料枠のAPIキーを登録してください。"));
+  w.append(h("div",{class:"row",style:"margin-top:16px"}, h("button",{class:"btn",onclick:()=>{S.view="new";S.err="";let seen=true;try{seen=!!localStorage.getItem("ishiroku_guided");}catch(e){} if(!seen) S.guide=0; render();},disabled:!S.ready||null},"新しい歴史を始める")));
+  w.append(h("h2",null,"続きから"));
+  if (!S.ready) w.append(h("p",{class:"note"},"読み込み中…"));
+  else if (!S.camps.length) w.append(h("p",{class:"note"},"まだキャンペーンはありません。上のボタンから時代と勢力を選んで始めましょう。命令はすべて自分の言葉で書きます。"));
+  for (const c of S.camps){
+    w.append(h("button",{class:"card camp",onclick:()=>{S.cur=c;S.view="game";S.tab=c.map?"map":"paper";S.paperIdx=null;S.err="";S.dipWith=null;render();}},
+      h("span",{class:"t"},c.title),
+      h("span",{class:"cstats"},
+        h("span",null,h("small",null,"ターン"),String(c.turn)),
+        h("span",null,h("small",null,"日付"),c.date),
+        c.map ? h("span",null,h("small",null,"領国"),String(Object.values(c.map).filter(o=>isMine(c,o)).length)) : null,
+        ...(c.metrics||[]).slice(0,2).map(m=>h("span",null,h("small",null,m.name),String(m.value)+(m.unit||"")))),
+      h("span",{class:"m"}, `${c.nation.name}　${c.date}　ターン${c.turn}　${c.setup.diff||"標準"}${c.setup.mode==="crucible"?"　クルーシブル":""}${c.over?"　【終局】":""}`)));
+  }
+  w.append(h("h3",null,"データの読み込み"));
+  w.append(h("p",{class:"note"},"別の端末で「設定 → 書き出し」したデータを貼り付けると復元できます。"));
+  const ta = h("textarea",{id:"imp",style:"min-height:70px",placeholder:"書き出したJSONを貼り付け"}); ta.value=S.importText; ta.oninput=()=>S.importText=ta.value;
+  w.append(ta, h("div",{class:"row"},h("button",{class:"btn ghost",onclick:async()=>{
+    try { const c = JSON.parse(S.importText); if(!c.nation||!c.setup) throw 0; c.id = uidGen(); migrate(c); S.camps.unshift(c); S.importText=""; S.err=""; await saveCamp(c); }
+    catch(e){ S.err="読み込めませんでした。書き出したデータを丸ごと貼り付けてください。"; }
+    render(); }},"読み込む")));
+  return w;
+}
+
+function newView(){
+  const st = S.setup, preset = PRESETS.find(p=>p.id===st.preset);
+  const w = h("div",{class:"stack"});
+  w.append(h("h2",null,"新しい歴史"));
+  w.append(h("div",null,h("label",null,"時代"), h("div",{class:"row"}, PRESETS.map(p=>h("button",{class:"chip","aria-pressed":String(st.preset===p.id),onclick:()=>{st.preset=p.id;st.faction="";render();}},p.label)))));
+  if (st.preset==="custom"){
+    const ta = h("textarea",{id:"era",style:"min-height:80px",placeholder:"例: 1600年、関ヶ原の戦いが西軍勝利に終わった直後の日本 / 魔法が蒸気機関と共存する架空大陸 / 横浜市旭区の商店街ひとつ"});
+    ta.value=st.era; ta.oninput=()=>st.era=ta.value;
+    w.append(h("div",null,h("label",{for:"era"},"舞台（自由に書く）"),ta));
+  } else w.append(h("div",{class:"intro"}, h("div",{class:"eyebrow-g"},"フリープレイ"), h("div",{class:"gh"},preset.title||preset.label), h("p",null,preset.intro||preset.era)));
+  const fi = h("input",{type:"text",id:"fac",list:"facl",placeholder: preset.roster ? "下の一覧から選ぶか、自由に入力" : "率いる勢力（例: "+(preset.factions[0]||"自分の街の商店会")+"）"});
+  fi.value=st.faction; fi.oninput=()=>st.faction=fi.value;
+  w.append(h("div",null,h("label",{for:"fac"},"率いる勢力"),fi,h("datalist",{id:"facl"},preset.factions.map(f=>h("option",{value:f})))));
+  if (preset.roster){
+    const hue = (n)=>{let x=0;for(const ch of n)x=(x*31+ch.charCodeAt(0))%360;return x;};
+    const qi = h("input",{type:"text",id:"facq",placeholder:"大名家を検索"}); qi.value=S.facQuery; qi.oninput=()=>{ S.facQuery=qi.value; const q=qi.value.trim(); document.querySelectorAll(".lord").forEach(b=>{ b.hidden = !!q && !b.dataset.n.includes(q); }); };
+    w.append(h("h3",{style:"font-size:22px"},"大名家を選ぶ"), qi);
+    w.append(h("div",{class:"roster",role:"list"},preset.roster.map(f=>h("button",{class:"lord",role:"listitem","data-n":f.name,hidden:(S.facQuery.trim() && !f.name.includes(S.facQuery.trim()))||null,style:`--c:hsl(${hue(f.name)} 45% 45%)`,"aria-pressed":String(st.faction===f.name),onclick:()=>{st.faction=f.name;render();}},h("span",{class:"n"},f.name),h("span",{class:"k"},f.prov+"国")))));
+  }
+  if (preset.factions.length) w.append(h("div",{class:"row"},preset.factions.map(f=>h("button",{class:"chip","aria-pressed":String(st.faction===f),onclick:()=>{st.faction=f;render();}},f))));
+  w.append(h("div",null,h("label",null,"世界がどれだけ抗うか"),h("div",{class:"stack",style:"gap:6px"},
+    DIFFS.map(([k,d])=>h("button",{class:"diff","aria-pressed":String(st.diff===k),onclick:()=>{st.diff=k;render();}},h("strong",null,k),h("span",null,d))))));
+  w.append(h("div",{class:"row"},h("button",{class:"chip","aria-pressed":String(st.mode==="crucible"),onclick:()=>{st.mode=st.mode==="crucible"?"standard":"crucible";render();}},(st.mode==="crucible"?"✓ ":"")+"クルーシブル（周りの勢力すべてがあなたを潰しにくる）")));
+  w.append(h("div",null,h("label",null,"1ターンの期間（あとで毎ターン変更できます）"),h("div",{class:"row"},TURN_UNITS.map(u=>h("button",{class:"chip","aria-pressed":String(st.unit===u),onclick:()=>{st.unit=u;render();}},u)))));
+  const nt = h("textarea",{id:"notes",style:"min-height:70px",placeholder:"任意。例: 史実より少し劇的に / 経済と外交中心で"}); nt.value=st.notes; nt.oninput=()=>st.notes=nt.value;
+  w.append(h("div",null,h("label",{for:"notes"},"追加の希望"),nt));
+  w.append(h("div",{class:"row"},h("button",{class:"btn",disabled:!!S.busy||null,onclick:startCampaign},"この世界で始める"),h("button",{class:"btn ghost",onclick:()=>{S.view="home";render();}},"戻る")));
+  w.append(h("p",{class:"note"},"開始時に世界の生成で1回、以後は1ターンの裁定・書状1通・顧問への相談1回ごとにGemini APIを1回呼び出します。"));
+  return w;
+}
+
+function tabBar(){
+  const c = S.cur;
+  const unread = c.dipLog.some(x=>x.unread);
+  const tabs = (c.map ? [["map","地図"]] : []).concat([["paper","年代記"],["orders","命令"],["dip","書状"],["adv","顧問"],["state","国情"]]);
+  return h("nav",{class:"tabs"},h("div",{class:"in"},tabs.map(([k,l])=>h("button",{"aria-current":S.tab===k?"page":null,onclick:()=>{S.tab=k;S.err="";if(k==="dip"){S.dipWith=null;S.compose=null;S.savedView=false;} if(k==="adv"){S.advId=null;} S.showOld=false;render();window.scrollTo(0,0);}},l, k==="dip"&&unread?h("span",{class:"udot","aria-label":"未読あり"}):null))));
+}
+function gameView(){
+  const c = S.cur;
+  if (S.tab==="paper") return paperView(c);
+  if (S.tab==="orders") return ordersView(c);
+  if (S.tab==="dip") return dipView(c);
+  if (S.tab==="adv") return advView(c);
+  if (S.tab==="state") return stateView(c);
+  if (S.tab==="map" && c.map) return mapView(c);
+  return settingsView(c);
+}
+
+function stampCls(r){ return r.includes("完全")?"ok":r.includes("部分")?"part":"ng"; }
+const CAT_COLOR = {"戦争":"#c0443a","政治":"#b8901c","経済":"#3f8a4c","外交":"#3f72b5","社会":"#7d5fae","諜報":"#5f636c","不穏":"#a2262b","宗教":"#a8692e","災害":"#8b2e2e"};
+const catColor = (k)=>CAT_COLOR[k]||"#5f636c";
+function fmtDelta(d){ return (d>0?"+":"")+d; }
+function allEvents(c){
+  const out = [];
+  for (const p of c.papers) for (const e of (p.events||[])) out.push({...e, turn:p.turn});
+  return out;
+}
+function chronToggle(c){
+  const n = allEvents(c).length;
+  return h("div",{class:"row",style:"margin-top:12px"},
+    h("button",{class:"chip","aria-pressed":String(!S.chronAll),onclick:()=>{S.chronAll=false;render();}},"このターン"),
+    h("button",{class:"chip","aria-pressed":String(S.chronAll),onclick:()=>{S.chronAll=true;S.catFilter=null;render();window.scrollTo(0,0);}},`全記録 ${n}`));
+}
+function allChronView(c){
+  const w = h("div");
+  w.append(chronToggle(c));
+  const evs = allEvents(c).reverse();
+  const cats = [...new Set(evs.map(e=>e.category))];
+  w.append(h("div",{class:"chronhead"}, h("div",{class:"eyebrow"}, c.setup.era.split("、")[0]), h("div",{class:"big"},"年代記"), h("div",{class:"meta"}, `これまでの記録 ${evs.length}件　${c.elapsed}日経過`)));
+  if (cats.length) w.append(h("div",{class:"row",style:"margin-top:8px"},
+    h("button",{class:"chip","aria-pressed":String(!S.catFilter),onclick:()=>{S.catFilter=null;render();}},"すべて"),
+    cats.map(k=>h("button",{class:"chip","aria-pressed":String(S.catFilter===k),style:`border-color:${catColor(k)}`,onclick:()=>{S.catFilter=k;render();}},k))));
+  const list = h("div",{class:"events"});
+  let lastTurn = null;
+  for (const e of evs.filter(e=>!S.catFilter||e.category===S.catFilter)){
+    if (e.turn!==lastTurn){ list.append(h("div",{class:"turnsep"}, `ターン ${e.turn}`)); lastTurn = e.turn; }
+    list.append(h("article",{class:"ev"},
+      h("div",{class:"evh"}, h("span",null, h("span",{class:"cat",style:`color:${catColor(e.category)}`}, e.category), e.secret?h("span",{class:"truth"},"真相"):null), h("span",{class:"note"}, (e.province?e.province+"　":"")+e.date)),
+      h("p",null,e.text),
+      e.effects&&e.effects.length ? h("div",{class:"row"}, e.effects.map(f=>h("span",{class:"eff"}, h("b",null,f.target)," ",jaMetric(f.metric)," ",h("span",{class:f.delta>0?"up":"down"},fmtNum(f.delta))))) : null));
+  }
+  if (!evs.length) list.append(h("p",{class:"note"},"まだ記録はありません。ターンを進めると出来事が積み上がります。"));
+  w.append(list);
+  return w;
+}
+const ORDER_LABEL = (r)=> !r ? null : r.includes("完全") ? ["実行済み","ok"] : r.includes("部分") ? ["一部実行","part"] : ["不首尾","ng"];
+function paperView(c){
+  if (S.chronAll) return allChronView(c);
+  const idx = S.paperIdx==null ? c.papers.length-1 : S.paperIdx;
+  const p = c.papers[idx];
+  const w = h("div");
+  if (!p) return h("p",{class:"note"},"記録がありません。");
+  w.append(chronToggle(c));
+  const sheet = h("article",{class:"paper chron"});
+  // 題字
+  sheet.append(h("div",{class:"mast"},
+    h("div",{class:"eyebrow"}, c.setup.era.split("、")[0]),
+    h("div",{class:"name"}, p.masthead || "年代記"),
+    h("div",{class:"dl"}, h("span",null, withDow(p.date) + (p.days!=null?`（${p.days}日経過）`:"")), h("span",null, p.turn===0?"創刊号":`第${p.turn}号`))));
+  sheet.append(h("h2",{class:"headline"},p.headline));
+  if (p.lead) sheet.append(h("p",{class:"lead"},p.lead));
+  // このターンの命令と実行状況
+  if (p.orders && p.orders.length){
+    const vs = p.verdicts||[];
+    const numbered = vs.some(v=>Number(v.no)>0);
+    const vOf = (i)=> numbered ? vs.find(v=>Number(v.no)===i+1) : vs[i];
+    const list = h("div",{class:"olist"});
+    p.orders.forEach((o,i)=>{
+      const v = vOf(i), lb = v ? ORDER_LABEL(v.result) : null;
+      list.append(h("div",{class:"oi"},
+        h("div",null, "▸ ", o, lb ? h("span",{class:"olab "+lb[1]}, lb[0]) : null),
+        v && (v.actor||v.constraint) ? h("div",{class:"oreason agc"}, v.actor?`担当: ${v.actor}`:"", v.constraint?`　条件: ${v.constraint}`:"") : null,
+        v && v.reason ? h("div",{class:"oreason"}, v.reason) : null));
+    });
+    sheet.append(h("details",{class:"orders-log",open:true}, h("summary",null,`このターンの命令・${p.orders.length}件`), list));
+  }
+  if ((p.progressed&&p.progressed.length) || (p.pending&&p.pending.length) || p.stopNote){
+    sheet.append(h("div",{class:"sumcard"},
+      p.stopNote ? h("div",{class:"note"},"進行を止めた理由: "+p.stopNote) : null,
+      p.progressed&&p.progressed.length ? h("div",null,h("div",{class:"sl"},"↗ 進んだこと"),h("ul",null,p.progressed.map(x=>h("li",null,x)))) : null,
+      p.pending&&p.pending.length ? h("div",null,h("div",{class:"sl"},"… まだ決まっていないこと"),h("ul",null,p.pending.map(x=>h("li",null,x)))) : null));
+  }
+  // 記事
+  const arts = h("div",{class:"events"});
+  if (p.opening && (p.opening.narrative || p.opening.standing)){
+    if (p.opening.narrative) arts.append(h("article",{class:"ev"}, h("div",{class:"evh"}, h("span",{class:"cat",style:"color:var(--part)"},"創刊"), h("span",{class:"note"},p.date)), h("p",null,p.opening.narrative)));
+    if (p.opening.standing) arts.append(h("article",{class:"ev"}, h("div",{class:"evh"}, h("span",{class:"cat",style:"color:var(--accent)"},"あなたの立場"), h("span",{class:"note"},p.date)), h("p",null,p.opening.standing)));
+    for (const pw of (p.opening.powers||[])) arts.append(h("article",{class:"ev"}, h("div",{class:"evh"}, h("span",{class:"cat",style:"color:var(--muted)"},"諸勢力"), h("span",{class:"note"},p.date)), h("p",null, h("b",null,pw.name+"："), pw.text)));
+  }
+  const dkey = (e)=>{ const d=parseJDate(e.date); return d&&d.d!=null ? d.y*10000+d.m*100+d.d : 0; };
+  const evs = (p.events||[]).map((e,i)=>[e,i]).sort((a,b)=>(dkey(a[0])-dkey(b[0]))||(a[1]-b[1])).map(x=>x[0]);
+  for (const e of evs){
+    arts.append(h("article",{class:"ev"+(e.secret?" secret-ev":"")},
+      h("div",{class:"evh"}, h("span",null, h("span",{class:"cat",style:`color:${catColor(e.category)}`}, e.category), e.secret ? h("span",{class:"truth"},"真相") : null), h("span",{class:"note"}, (e.province?e.province+"　":"")+e.date)),
+      h("p",null,e.text),
+      e.effects && e.effects.length ? h("div",{class:"row"}, e.effects.map(f=>h("span",{class:"eff"}, h("b",null,f.target)," ",jaMetric(f.metric)," ",h("span",{class:f.delta>0?"up":"down"},fmtNum(f.delta))))) : null));
+  }
+  // 旧形式の号（記事・短信）
+  for (const a of (p.articles||[])) arts.append(h("article",{class:"ev"}, h("div",{class:"evh"}, h("span",{class:"cat",style:"color:var(--muted)"},"記事")), h("p",null, h("b",null,a.title+"　"), a.body)));
+  sheet.append(arts);
+  if (p.briefs && p.briefs.length) sheet.append(h("div",{class:"briefs"},h("div",{class:"ttl"},"各地短信"),h("ul",null,p.briefs.map(b=>h("li",null,b)))));
+  // 数字で見るこの号
+  const md = (p.mdeltas||[]), chips = [];
+  for (const m of (p.moves||[])){
+    if (m.koku!=null) chips.push([m.from,"石高",-m.koku*10000],[m.to,"石高",m.koku*10000]);
+    if (m.levy!=null) chips.push([m.from,"動員兵力",-m.levy*1000],[m.to,"動員兵力",m.levy*1000]);
+  }
+  const legacy = p.deltas ? Object.entries(p.deltas).filter(([,d])=>d) : [];
+  if (md.length || (p.moves&&p.moves.length) || legacy.length){
+    const vb = h("div",{class:"verd"}, h("div",{class:"ttl"},"数字で見るこの号"));
+    if (md.length) vb.append(h("div",{class:"deltas"}, md.map(m=>h("span",{class:m.delta==null?"":m.delta>0?"up":"down"}, m.delta==null?`新指標 ${m.name} ${fmtNum(m.value).replace(/^\+/,"")}`:`${m.name} ${fmtNum(m.delta)}`))));
+    if (legacy.length) vb.append(h("div",{class:"deltas"}, legacy.map(([k,d])=>h("span",{class:d>0?"up":"down"},`${k} ${fmtNum(d)}`))));
+    if (p.moves && p.moves.length) vb.append(h("div",{class:"deltas"}, p.moves.map(m=>h("span",{class:isMine(c,m.to)?"up":isMine(c,m.from)?"down":""},`${m.province}: ${m.from} → ${m.to}`))));
+    if (chips.length) vb.append(h("div",{class:"row",style:"margin-top:6px"}, chips.map(([t,k,d])=>h("span",{class:"eff"}, h("b",null,t)," ",k," ",h("span",{class:d>0?"up":"down"},fmtNum(d))))));
+    sheet.append(vb);
+  }
+  w.append(sheet);
+  w.append(h("div",{class:"pager"},
+    h("button",{class:"linkbtn",disabled:idx<=0||null,onclick:()=>{S.paperIdx=idx-1;render();window.scrollTo(0,0);}},"← 前の号"),
+    h("span",{class:"note"},`${idx+1} / ${c.papers.length}`),
+    h("button",{class:"linkbtn",disabled:idx>=c.papers.length-1||null,onclick:()=>{S.paperIdx=idx+1;render();window.scrollTo(0,0);}},"次の号 →")));
+  if (c.over) w.append(h("div",{class:"card",style:"margin-top:12px;border-color:var(--ng)"},h("strong",{style:"color:var(--ng)"},"終局"),h("span",null,c.over)));
+  else if (idx===c.papers.length-1) w.append(h("div",{class:"row",style:"margin-top:12px"}, c.map ? h("button",{class:"btn",onclick:()=>{S.tab="map";render();window.scrollTo(0,0);}},"年代記を閉じる → 地図へ") : null, h("button",{class:c.map?"btn ghost":"btn",onclick:()=>{S.tab="orders";render();window.scrollTo(0,0);}},`ターン ${c.turn} の命令を書く`)));
+  return w;
+}
+
+const TURN_LENS = ["自動","1時間","半日","1日","3日","1週","2週","1か月","3か月","半年","1年"];
+function ordersView(c){
+  const w = h("div",{class:"stack"});
+  w.append(h("div",{class:"datebox"}, h("div",null,h("div",{class:"note"},"勢力"),h("strong",null,c.nation.name)), h("div",{style:"text-align:right"},h("strong",null,c.date),h("div",{class:"note"},`ターン ${c.turn}・${c.elapsed}日経過`))));
+  const q = h("div",{class:"card"}, h("div",{class:"row",style:"justify-content:space-between"},h("strong",null,"このラウンド"),h("span",{class:"note"},c.queue.length?`命令 ${c.queue.length}件`:"まだ命令はありません")));
+  c.queue.forEach((o,i)=>q.append(h("div",{class:"qi"}, h("span",null, h("span",{class:"qsrc"}, (c.qsrc&&c.qsrc[o])||"あなた"), " 実行待ち", h("br"), `${i+1}. ${o}`), h("span",{class:"row",style:"flex-wrap:nowrap;gap:10px"},
+    i>0 ? h("button",{class:"linkbtn","aria-label":"優先順位を上げる",onclick:()=>{[c.queue[i-1],c.queue[i]]=[c.queue[i],c.queue[i-1]];saveCamp(c);render();}},"↑") : null,
+    h("button",{class:"linkbtn",style:"color:var(--ng)","aria-label":"この命令を取り消す",onclick:()=>{c.queue.splice(i,1);saveCamp(c);render();}},"取消")))));
+  if (c.queue.length>1) q.append(h("div",{class:"note"},"上にある命令ほど優先されます。"));
+  w.append(q);
+  const ta = h("textarea",{id:"orders",style:"min-height:150px",placeholder:"このラウンド、何をしますか？\n「誰に・何を達成してほしいか・守ってほしい条件」を書くと伝わります。\n例: 奉行衆に、蒲生・野洲の境目へ番所を設けさせ関銭を取り立てる。六角家とは事を構えないこと。",disabled:!!c.over||null});
+  ta.value = S.draftOrders; ta.oninput=()=>S.draftOrders=ta.value;
+  w.append(ta);
+  w.append(h("div",{class:"row"},
+    h("button",{class:"btn ghost",disabled:(!!S.busy||!!c.over)||null,onclick:()=>{ const t=S.draftOrders.trim(); if(!t) return; c.queue.push(t); S.draftOrders=""; saveCamp(c); render(); }},"命令を追加"),
+  ));
+  const sel = h("select",{id:"turnlen","aria-label":"このターンの期間"}, TURN_LENS.map(l=>h("option",{value:l,selected:c.turnLen===l||null}, l==="自動"?"自動（命令に応じて）":l)));
+  sel.onchange=()=>{ c.turnLen = sel.value; saveCamp(c); };
+  const sc = h("input",{type:"text",id:"stopcond",placeholder:"進行を止める条件（任意）例: 六角家から返答があったとき"}); sc.value = c.stopCond||""; sc.onchange=()=>{ c.stopCond = sc.value.trim(); saveCamp(c); };
+  w.append(h("div",{class:"row",style:"flex-wrap:nowrap"}, h("div",{style:"flex:1"},h("label",{for:"turnlen"},"期間"),sel), h("button",{class:"btn",style:"align-self:flex-end",disabled:(!!S.busy||!!c.over)||null,onclick:endTurn},"ターン終了"+(c.queue.length?"・"+c.queue.length:""))));
+  w.append(h("div",null,h("label",{for:"stopcond"},"進行を止める条件"),sc,h("div",{class:"note"},"短い期間は危機の最中に細かく判断できます。長い期間は計画が進みますが、その間に他勢力も動きます。")));
+  const sent = c.dipLog.filter(x=>x.turn===c.turn && x.role==="user").length;
+  w.append(h("p",{class:"note"}, (sent ? `このターンに送った書状 ${sent}通も裁定に反映されます。` : "命令は何件でも追加できます。入力欄に書いたままでもターン終了で一緒に送られます。")));
+  w.append(h("h3",null,"書き方のこつ"));
+  w.append(h("ul",{class:"note",style:"margin:0;padding-left:1.2em"},
+    h("li",null,"「誰に・何を・どれだけ・なぜ」を書くと裁定が具体的になります。"),
+    h("li",null,"時間のかかる命令は「計画」として数ターンかけて進みます。"),
+    h("li",null,"迷ったら「顧問」に今すべきことを聞けます。")));
+  return w;
+}
+
+function allFactions(c){
+  const set = new Set();
+  (c.setup.roster||"").split("、").forEach(x=>{ const n=x.split(":")[0]; if(n) set.add(n); });
+  if (c.map) Object.values(c.map).forEach(o=>set.add(o));
+  c.rivals.forEach(r=>set.add(r.name));
+  set.delete("国人衆");
+  return [...set].filter(n=>!isMine(c,n));
+}
+function composeView(c){
+  const cp = S.compose, w = h("div",{class:"stack"});
+  const lastFrom = (n)=>{ const l=c.dipLog.filter(x=>x.with===n && x.role==="assistant" && x.from); return l.length ? l[l.length-1].from : null; };
+  const lastAt = (n)=>{ let k=-1; c.dipLog.forEach((x,i)=>{ if(x.with===n) k=i; }); return k; };
+  w.append(h("div",{class:"row",style:"justify-content:space-between"}, h("button",{class:"linkbtn",onclick:()=>{S.compose=null;render();}},"← 書状一覧"), h("span",{class:"note"},"外交・政務通信")));
+  w.append(h("h2",{style:"margin-top:0"},"新しい書状"));
+  if (cp.step==="write"){
+    w.append(h("div",{class:"note"},"宛先: "+cp.sel.join("、")));
+    const ta = h("textarea",{id:"multimsg",style:"min-height:140px",placeholder: cp.sel.length>1 ? "同じ書状をそれぞれに送ります。返事は相手ごとに届きます。" : "書状の内容"}); ta.value=cp.text||""; ta.oninput=()=>cp.text=ta.value;
+    w.append(ta, h("div",{class:"row"}, h("button",{class:"btn ghost",onclick:()=>{cp.step="pick";render();}},"宛先を変更"), h("button",{class:"btn",disabled:!!S.busy||null,onclick:sendMulti}, cp.sel.length>1?`${cp.sel.length}者に送る`:"送る")));
+    return w;
+  }
+  const qi = h("input",{type:"text",id:"composeq",placeholder:"部署・国・名前で検索"}); qi.value = cp.q||"";
+  qi.oninput = ()=>{ cp.q = qi.value; const q = qi.value.trim(); document.querySelectorAll(".pick").forEach(b=>{ b.hidden = !!q && !(b.dataset.s||"").includes(q); }); const nf=document.getElementById("newfree"); if(nf){ nf.hidden=!q; nf.querySelector("b").textContent=q; } };
+  w.append(qi, h("div",{class:"note"},"宛先を選んでください（複数選択可）"));
+  const row = (name, sub, from, indent)=>{
+    const on = cp.sel.includes(name), q=(cp.q||"").trim(), hay = name+" "+(sub||"")+" "+(from||"");
+    return h("button",{class:"pick"+(indent?" ind":""), "aria-pressed":String(on), "data-s":hay, hidden:(q && !hay.includes(q))||null, onclick:()=>{ if(on) cp.sel=cp.sel.filter(x=>x!==name); else cp.sel.push(name); render(); }},
+      h("span",{class:"av"}, name.slice(0,1)),
+      h("span",{class:"cb"}, h("span",{class:"cn"},name), sub?h("span",{class:"cs"},sub):null, from?h("span",{class:"cs"},"過去の返信者："+from):null),
+      h("span",{class:"chk"}, on?"✓":""));
+  };
+  const recent = [...new Set(c.dipLog.map(x=>x.with))].filter(n=>findContact(c,n)).sort((a,b)=>lastAt(b)-lastAt(a)).slice(0,6);
+  if (recent.length){ w.append(h("div",{class:"sect"},"最近やり取りした相手")); recent.forEach(n=>{ const ct=findContact(c,n); w.append(row(n, ct.kind==="internal"?c.nation.name:ct.kind==="other"?(ct.o.role||"その他"):"勢力", lastFrom(n))); }); }
+  w.append(h("div",{class:"sect"},"自国政府"));
+  w.append(row(c.nation.name+"（家中全体）", "評定・重臣へ", null, false));
+  c.internal.forEach(it=>w.append(row(it.name, c.nation.name+"・"+it.role, lastFrom(it.name), true)));
+  (c.others||[]).filter(o=>!allFactions(c).includes(o.name)).forEach(o=>w.append(row(o.name, o.role||"その他", lastFrom(o.name), false)));
+  w.append(h("div",{class:"sect"},"勢力"));
+  const facs = allFactions(c).sort((a,b)=>(lastAt(b)>-1?1:0)-(lastAt(a)>-1?1:0));
+  facs.forEach(n=>{ const r=c.rivals.find(x=>x.name===n); w.append(row(n, r?`${r.leader||""}　${r.stance}`:"", lastFrom(n))); });
+  const nr = h("input",{type:"text",id:"newrole",placeholder:"どんな相手か（任意）"});
+  w.append(h("div",{class:"card",id:"newfree",hidden:!(cp.q||"").trim()||null}, h("span",null,"一覧にない相手「",h("b",null,cp.q||""),"」に書状を出す"), nr,
+    h("button",{class:"btn ghost",onclick:()=>{ const n=(cp.q||"").trim(); if(!n) return; if(!findContact(c,n)) (c.others ||= []).push({name:n, role:nr.value.trim()}); if(!cp.sel.includes(n)) cp.sel.push(n); cp.q=""; saveCamp(c); render(); }},"宛先に加える")));
+  w.append(h("div",{class:"composebar"}, h("span",{class:"note"}, cp.sel.length?`${cp.sel.length}件選択中`:"未選択"), h("button",{class:"btn",disabled:!cp.sel.length||null,onclick:()=>{cp.step="write";render();window.scrollTo(0,0);}},"書状を書く →")));
+  return w;
+}
+const ADV_TEMPLATE = "今、私が対応すべきことはありますか？決裁待ちの案件と自国の停滞中の計画について、障害と具体的な次の一手を整理してください。現在の記録に基づき、不足する情報は明示し、案件がなければそう伝えてください。助言のみを求めています。命令の発行や変更は行わないでください。";
+function advThread(c){ return (c.advThreads||[]).find(t=>t.id===S.advId) || null; }
+function parseProps(text){
+  const out = [];
+  for (const m of String(text).matchAll(/【命令案】\s*([^\n]+)/g)){
+    const raw = m[1].trim(), k = raw.search(/[｜|]/);
+    out.push(k>0 ? {actor:raw.slice(0,k).trim(), text:raw.slice(k+1).trim()} : {actor:"", text:raw});
+  }
+  return out;
+}
+function advView(c){
+  const w = h("div",{class:"stack"});
+  const th = S.advId==="new" ? "new" : advThread(c);
+  if (!th){
+    w.append(h("div",{class:"row",style:"justify-content:space-between;align-items:baseline"}, h("h2",null,"顧問"),
+      h("button",{class:"btn ghost",onclick:()=>{ S.advId="new"; S.draftAdv=""; render(); window.scrollTo(0,0); }},"＋ 新しい会話")));
+    w.append(h("button",{class:"card suggest",onclick:()=>{ S.advId="new"; S.draftAdv=ADV_TEMPLATE; render(); window.scrollTo(0,0); }},
+      h("strong",null,"↗ 今、対応すべきことは？"), h("span",{class:"note"},"決裁待ち・停滞中の計画・次の一手（送る前に文面を確認できます）")));
+    const list = (c.advThreads||[]).slice().sort((a,b)=>(b.pin?1:0)-(a.pin?1:0) || (b.updated||0)-(a.updated||0));
+    if (!list.length) w.append(h("p",{class:"note"},"顧問は世界の状況・指標・計画を把握したうえで助言します。相談してもターンは進みません。"));
+    for (const t of list){
+      const last = t.log.filter(x=>x.role==="assistant").slice(-1)[0];
+      w.append(h("div",{class:"crow"},
+        h("button",{class:"contact",onclick:()=>{ S.advId=t.id; S.toBottom=true; render(); }},
+          h("span",{class:"cb"}, h("span",{class:"cn"}, t.title), h("span",{class:"cs"}, last ? last.content.replace(/【命令案】[^\n]*/g,"").trim() : "（返答待ち）"))),
+        h("button",{class:"pin"+(t.pin?" on":""),"aria-label":t.pin?"ピン留めを外す":"ピン留め",onclick:()=>{ t.pin=!t.pin; saveCamp(c); render(); }},"📌")));
+    }
+    return w;
+  }
+  return advThreadView(c, th);
+}
+function advThreadView(c, th){
+  const w = h("div",{class:"stack"});
+  const isNew = th==="new";
+  w.append(h("div",{class:"row",style:"justify-content:space-between"}, h("button",{class:"linkbtn",onclick:()=>{S.advId=null;render();}},"← 会話一覧"), h("span",{class:"note"},"顧問")));
+  w.append(h("h2",{style:"margin-top:0"}, isNew ? "新しい会話" : th.title));
+  const chat = h("div",{class:"chat"});
+  const log = isNew ? [] : th.log;
+  const hidden = Math.max(0, log.length - (S.showOld ? 999 : 30));
+  if (hidden) chat.append(h("button",{class:"linkbtn",onclick:()=>{S.showOld=true;render();}},`以前のメッセージを読み込む（${hidden}件）`));
+  log.slice(hidden).forEach((m)=>{
+    const props = m.role==="assistant" ? parseProps(m.content) : [];
+    const body = m.role==="assistant" ? m.content.replace(/\n?【命令案】[^\n]*/g,"").trim() : m.content;
+    chat.append(h("div",{class:"msg "+(m.role==="user"?"me":"them")}, h("span",{class:"who"}, (m.role==="user"?"あなた":"顧問")+`・ターン${m.turn}`), body,
+      h("button",{class:"bm"+(m.saved?" on":""),"aria-label":"しおり",onclick:()=>{ m.saved=!m.saved; saveCamp(c); render(); }},"🔖")));
+    for (const pr of props){
+      const full = pr.actor ? `${pr.actor}に、${pr.text}` : pr.text;
+      const queued = c.queue.includes(full);
+      chat.append(h("div",{class:"prop"}, h("div",null, pr.actor?h("div",{class:"note"},pr.actor):null, h("strong",null,pr.text)),
+        h("button",{class:"btn ghost",disabled:(queued||m.turn!==c.turn)||null,onclick:()=>{ c.queue.push(full); (c.qsrc ||= {})[full]="顧問"; saveCamp(c); render(); }}, queued?"命令に追加済み":m.turn!==c.turn?"過去の案":"命令に追加")));
+    }
+  });
+  if (S.busy && S.busy.label==="顧問が考えています") chat.append(h("div",{class:"note"},"協議中…"));
+  w.append(chat);
+  w.append(h("p",{class:"note"},"顧問の提案はまだ命令ではありません。「命令に追加」した命令だけが、ターン終了時に実行されます。"));
+  const ta = h("textarea",{id:"advmsg",style:"min-height:90px",placeholder:"このラウンドについて質問…"}); ta.value=S.draftAdv; ta.oninput=()=>S.draftAdv=ta.value;
+  w.append(ta, h("div",{class:"row"},
+    h("button",{class:"btn ghost",onclick:()=>{ S.draftAdv=ADV_TEMPLATE; render(); }},"定型文を入れる"),
+    h("button",{class:"btn",disabled:!!S.busy||null,onclick:()=>askAdvisor()},"相談する")));
+  return w;
+}
+function advTurns(c, th){
+  const rules = `あなたは「${c.nation.name}」の筆頭顧問です。主君「${c.nation.leader}」の問いに、以下の世界状態を踏まえて答えます。
+
+規則: 状況を短く整理し、打てる手を2〜3個、利点と危険を添えて示す。指標の数値など記録にある根拠を具体的に引く。決めるのは主君なので断定しないが、主君の考えに穴があれば遠慮なく指摘し、反対すべきときは反対する（おもねらない）。知りえない他勢力の本音(hidden_agenda)は推測としてのみ語る。記録にない情報は「不明」と明示する。助言はあくまで提案で、命令ではない。日本語・400字以内。${NUM_RULE}
+主君が「〜してくれ」「計画を作れ」など実行を求めたときや、具体的な一手を勧めるときは、本文の後に1行ずつ「【命令案】担当｜命令文（条件も含める）」の形で最大3つ書く。担当を決めにくい場合は「【命令案】命令文」だけでよい（例: 【命令案】勘定奉行｜資金計画を作らせる。まだ支出はしないこと）。
+
+自勢力の背景: ${loreText([loreKey(c.setup.faction)].filter(Boolean)) || "（なし）"}
+世界状態(JSON): ${JSON.stringify(worldView(c))}
+直近の年代記: ${c.chronicle.slice(-6).map(x=>x.summary).join(" / ")}
+世界が覚えていること: ${memText(c)}`;
+  return [{role:"user", content:rules}, ...th.log.slice(-10).map(x=>({role:x.role, content:x.content}))];
+}
+async function askAdvisor(q){
+  const c = S.cur, text = (q || S.draftAdv).trim();
+  if (!text) return;
+  if (!S.sample){ S.err = ERR.not_granted; render(); return; }
+  S.err = "";
+  c.advThreads ||= [];
+  let th = advThread(c), created = false;
+  if (!th){ th = {id:"a"+Date.now().toString(36), title:text.length>40?text.slice(0,40)+"…":text, log:[], updated:Date.now()}; c.advThreads.push(th); S.advId = th.id; created = true; }
+  th.log.push({role:"user", content:text, turn:c.turn});
+  S.draftAdv = "";
+  try {
+    const reply = await streamText(advTurns(c, th), "顧問が考えています");
+    th.log.push({role:"assistant", content:reply, turn:c.turn});
+    th.updated = Date.now();
+    if (th.log.length>60) th.log.splice(0, th.log.length-60);
+    if (c.advThreads.length>30) c.advThreads.splice(0, c.advThreads.length-30);
+    await saveCamp(c);
+  } catch(e){
+    th.log.pop(); S.draftAdv = text;
+    if (created){ c.advThreads = c.advThreads.filter(x=>x!==th); S.advId = "new"; }
+    if (e.code!=="cancelled") S.err = errMsg(e);
+  }
+  S.toBottom = true; render();
+}
+
+function savedView(c){
+  const w = h("div",{class:"stack"});
+  w.append(h("div",{class:"row",style:"justify-content:space-between"}, h("button",{class:"linkbtn",onclick:()=>{S.savedView=false;render();}},"← 書状一覧"), h("span",{class:"note"},"外交・政務通信")));
+  w.append(h("h2",{style:"margin-top:0"},"保存した書状"));
+  const items = [...c.dipLog.filter(m=>m.saved).map(m=>({m, where:m.with, open:()=>{S.savedView=false;S.dipWith=m.with;S.tab="dip";}})),
+    ...(c.advThreads||[]).flatMap(t=>t.log.filter(m=>m.saved).map(m=>({m, where:"顧問："+t.title, open:()=>{S.savedView=false;S.tab="adv";S.advId=t.id;}})))];
+  const qi = h("input",{type:"text",id:"savedq",placeholder:"保存した書状を検索"}); qi.value=S.savedQ||""; qi.oninput=()=>{ S.savedQ=qi.value; document.querySelectorAll(".saved").forEach(el=>{ el.hidden = !!qi.value.trim() && !el.dataset.s.includes(qi.value.trim()); }); };
+  w.append(qi);
+  if (!items.length) w.append(h("div",{class:"card",style:"text-align:center"}, h("div",{style:"font-size:28px"},"🔖"), h("strong",null,"大切な書状を手元に"), h("span",{class:"note"},"書状の下のしおりを押すと、ここからいつでも読み返せます。")));
+  for (const it of items.reverse()){
+    const who = it.m.role==="user" ? "あなた" : (it.m.from||it.where);
+    w.append(h("div",{class:"card saved","data-s":it.where+who+it.m.content, hidden:(S.savedQ&&!(it.where+who+it.m.content).includes(S.savedQ.trim()))||null},
+      h("div",{class:"note"}, `${who}・ターン${it.m.turn}`), h("strong",null,it.where),
+      h("details",null, h("summary",null,"保存した内容を読む"), h("p",{style:"white-space:pre-wrap;margin:6px 0"},it.m.content)),
+      h("div",{class:"row"}, h("button",{class:"linkbtn",onclick:()=>{ it.open(); S.toBottom=true; render(); }},"元の会話で開く ↗"),
+        h("button",{class:"linkbtn",style:"color:var(--ng)",onclick:()=>{ it.m.saved=false; saveCamp(c); render(); }},"しおりを外す"))));
+  }
+  return w;
+}
+function dipView(c){
+  if (S.savedView) return savedView(c);
+  if (S.compose) return composeView(c);
+  const w = h("div",{class:"stack"});
+  const contacts = [...c.internal.map(x=>({name:x.name, sub:x.role, kind:"internal"})), ...c.rivals.map(r=>({name:r.name, sub:`${r.leader||""}　${r.stance}（${r.attitude}）`, kind:"foreign"})), ...(c.others||[]).map(o=>({name:o.name, sub:o.role||"新しい相手", kind:"other"}))];
+  if (!S.dipWith || !findContact(c, S.dipWith)){
+    w.append(h("h2",null,"書状"));
+    w.append(h("p",{class:"note",style:"margin:0"},"家中や他勢力とやりとりします。相手から書状が届くこともあります。家中への指示は、次のターンで実行されます。"));
+    w.append(h("div",{class:"row"}, h("button",{class:"btn",onclick:()=>{ S.compose={sel:[], q:"", text:"", step:"pick"}; render(); window.scrollTo(0,0); }},"＋ 新しい書状"),
+      h("button",{class:"btn ghost",onclick:()=>{ S.savedView=true; render(); window.scrollTo(0,0); }},"🔖 保存した書状")));
+    const lastOf = (n)=>{ const l=c.dipLog.filter(x=>x.with===n); return l[l.length-1]; };
+    const lastAt = (n)=>{ let k=-1; c.dipLog.forEach((x,i)=>{ if(x.with===n) k=i; }); return k; };
+    const pinned = (n)=>(c.pins||[]).includes(n) ? 1 : 0;
+    const sorted = contacts.slice().sort((a,b)=> pinned(b.name)-pinned(a.name) || (c.dipLog.some(x=>x.with===b.name&&x.unread)?1:0)-(c.dipLog.some(x=>x.with===a.name&&x.unread)?1:0) || lastAt(b.name)-lastAt(a.name));
+    let lastKind = null;
+    for (const ct of sorted){
+      const last = lastOf(ct.name), unread = c.dipLog.some(x=>x.with===ct.name && x.unread);
+      w.append(h("div",{class:"crow"}, h("button",{class:"contact",onclick:()=>{ S.showOld=false; S.dipWith=ct.name; c.dipLog.forEach(x=>{ if(x.with===ct.name) delete x.unread; }); saveCamp(c); S.toBottom=true; render(); }},
+        h("span",{class:"av"+(ct.kind==="internal"?" in":"")}, ct.name.slice(0,1)),
+        h("span",{class:"cb"}, h("span",{class:"cn"}, ct.name, h("span",{class:"kind"}, ct.kind==="internal"?(capOf(c.internal.find(x=>x.name===ct.name))>1?`家中・任務${activeFor(c,ct.name).length+missionsFor(c,ct.name).length}/${capOf(c.internal.find(x=>x.name===ct.name))}`:"家中"):ct.kind==="other"?"その他":"他勢力")), h("span",{class:"cs"}, last ? last.content : ct.sub)),
+        unread ? h("span",{class:"udot static","aria-label":"未読"}) : null),
+        h("button",{class:"pin"+((c.pins||[]).includes(ct.name)?" on":""),"aria-label":"ピン留め",onclick:()=>{ c.pins ||= []; c.pins = c.pins.includes(ct.name) ? c.pins.filter(x=>x!==ct.name) : [...c.pins, ct.name]; saveCamp(c); render(); }},"📌")));
+    }
+    return w;
+  }
+  const name = S.dipWith, ct = findContact(c, name);
+  w.append(h("div",{class:"row",style:"justify-content:space-between"}, h("button",{class:"linkbtn",onclick:()=>{S.dipWith=null;render();}},"← 書状一覧"), h("span",{class:"note"}, ct.kind==="internal" ? "家中" : ct.kind==="other" ? "その他" : `${ct.r.stance}（${ct.r.attitude}）`)));
+  w.append(h("h2",{style:"margin-top:4px"},name));
+  if (ct.kind==="internal" && capOf(ct.i)>1){
+    const cap = capOf(ct.i), act = activeFor(c,name), q = missionsFor(c,name), used = act.length + q.length;
+    const mp = h("div",{class:"card mission"},
+      h("div",{class:"row",style:"justify-content:space-between"}, h("strong",null,"任務"), h("span",{class:"note"}, (ct.i.members?ct.i.members+"・":"")+`同時に ${cap} つまで`)),
+      h("div",{class:"slots"}, Array.from({length:Math.max(cap,used)},(_,k)=>h("span",{class:"slot"+(k<act.length?" act":k<used?" q":"")+(k>=cap?" over":"")}))),
+      h("div",{class:"note"}, `進行中 ${act.length}・今回出す ${q.length}` + (used>cap ? "　人手が足りず、成功しにくくなります" : "")));
+    for (const p of act) mp.append(h("div",{class:"mi"}, h("span",null,"▶ "+p.title), h("span",{class:"note"},p.progress+"%")));
+    q.forEach(o=>mp.append(h("div",{class:"mi"}, h("span",null,"＋ "+o.slice(name.length+5)), h("button",{class:"linkbtn",style:"color:var(--ng)",onclick:()=>{ c.queue.splice(c.queue.indexOf(o),1); delete c.qsrc[o]; saveCamp(c); render(); }},"取消"))));
+    const mi = h("input",{type:"text",id:"mission",placeholder:"例: 浅井領の湖上交通を探らせる"});
+    mp.append(h("div",{class:"row",style:"flex-wrap:nowrap"}, mi, h("button",{class:"btn ghost",style:"flex:none",disabled:!!c.over||null,onclick:()=>{ const t=mi.value.trim(); if(!t) return; const full=`${name}への任務：${t}`; c.queue.push(full); (c.qsrc ||= {})[full]="任務"; saveCamp(c); render(); }},"任務を追加")));
+    mp.append(h("div",{class:"note"},"任務は「命令」の一覧にも入り、ターン終了で一斉に動きます。数ターンかかるものは計画として進みます。"));
+    w.append(mp);
+  }
+  w.append(h("p",{class:"note",style:"margin:0"}, ct.kind==="internal" ? ct.i.role : ct.kind==="other" ? (ct.o.role||"まだ関係の浅い相手です。") : ct.r.public_note));
+  const chat = h("div",{class:"chat"});
+  const all = c.dipLog.filter(x=>x.with===name);
+  const hidden = Math.max(0, all.length - (S.showOld ? 9999 : 30));
+  if (!all.length) chat.append(h("p",{class:"note"},"まだやりとりはありません。"));
+  if (hidden) chat.append(h("button",{class:"linkbtn",onclick:()=>{S.showOld=true;render();}},`以前のメッセージを読み込む（${hidden}件）`));
+  for (const m of all.slice(hidden)) chat.append(h("div",{class:"msg "+(m.role==="user"?"me":"them")}, h("span",{class:"who"}, (m.role==="user"?c.nation.name:(m.from||name))+`・ターン${m.turn}`+(m.incoming?"・届いた書状":"")), m.content,
+    m.answer && m.answer!=="なし" ? h("span",{class:"ans ans-"+m.answer}, "回答: "+m.answer) : null,
+    m.exec ? h("span",{class:"ans ans-合意"}, "命令に追加: "+m.exec) : null,
+    h("button",{class:"bm"+(m.saved?" on":""),"aria-label":"しおり",onclick:()=>{ m.saved=!m.saved; saveCamp(c); render(); }},"🔖")));
+  if (S.busy && /返書を準備中/.test(S.busy.label) && S.busy.label.startsWith(name)) chat.append(h("div",{class:"note"},"返信を待っています…（他の画面に移っても大丈夫です）"));
+  w.append(h("p",{class:"note"},"提案しただけでは合意になりません。相手の回答が「合意」になったものだけが約束として記録されます。"));
+  w.append(chat);
+  const ta = h("textarea",{id:"dipmsg",style:"min-height:100px",placeholder:`${name}への書状`,disabled:!!c.over||null}); ta.value=S.draftMsg; ta.oninput=()=>S.draftMsg=ta.value;
+  w.append(ta, h("div",{class:"row"},h("button",{class:"btn",disabled:(!!S.busy||!!c.over)||null,onclick:sendDip},"送る")));
+  w.append(h("button",{class:"tolatest","aria-label":"最新のやりとりへ",onclick:()=>window.scrollTo({top:document.documentElement.scrollHeight,behavior:"smooth"})},"↓ 最新へ"));
+  w.prepend(h("span",{id:"thread-top"}));
+  return w;
+}
+
+
+function isMine(c,o){ return o===c.nation.name || c.setup.faction===o || c.setup.faction.startsWith(o+"（"); }
+function makeSnapshot(c){
+  const tiles = MAPS[c.setup.mapId] || [];
+  const W=1600, H=900, cv=document.createElement("canvas"); cv.width=W; cv.height=H;
+  const g=cv.getContext("2d");
+  g.fillStyle="#0b0b0b"; g.fillRect(0,0,W,H);
+  const minC=Math.min(...tiles.map(t=>t.col)), maxC=Math.max(...tiles.map(t=>t.col)), maxR=Math.max(...tiles.map(t=>t.row));
+  const cols=maxC-minC+1, rows=maxR+1, area={x:60,y:40,w:900,h:820};
+  const cs=Math.min(area.w/cols, area.h/rows), ox=area.x+(area.w-cols*cs)/2, oy=area.y+(area.h-rows*cs)/2;
+  const font = '"Zen Kaku Gothic New","Hiragino Sans","Noto Sans JP",sans-serif';
+  if (S.mapMode==="real"){
+    const G=buildGeo(), [x0,y0,x1,y1]=G.bounds, sc=Math.min(area.w/(x1-x0), area.h/(y1-y0)), tx=area.x+(area.w-(x1-x0)*sc)/2, ty=area.y+(area.h-(y1-y0)*sc)/2;
+    const P=(pts)=>{ const p=new Path2D(); pts.forEach(([x,y],i)=>{ const X=tx+(x-x0)*sc, Y=ty+(y-y0)*sc; i?p.lineTo(X,Y):p.moveTo(X,Y); }); p.closePath(); return p; };
+    const land=new Path2D(); for (const pts of Object.values(G.islands)) land.addPath(P(pts));
+    g.save(); g.clip(land);
+    for (const t of tiles){ const cell=G.cells[t.name]; if(!cell) continue; const o=c.map[t.name]||"国人衆"; const pp=P(cell); g.fillStyle=ownerColor(o); g.fill(pp); g.strokeStyle="#0b0b0b"; g.lineWidth=1.2; g.stroke(pp); }
+    for (const t of tiles){ const cell=G.cells[t.name]; if(!cell) continue; if (isMine(c,c.map[t.name]||"")){ g.strokeStyle="#f2c14e"; g.lineWidth=3.5; g.stroke(P(cell)); } }
+    g.restore();
+  } else for (const t of tiles){
+    const o=c.map[t.name]||"国人衆", x=ox+(t.col-minC)*cs, y=oy+t.row*cs;
+    g.fillStyle=ownerColor(o); g.fillRect(x+1.5,y+1.5,cs-3,cs-3);
+    if (isMine(c,o)){ g.strokeStyle="#f2c14e"; g.lineWidth=4; g.strokeRect(x+3,y+3,cs-6,cs-6); }
+    g.fillStyle="rgba(255,255,255,.92)"; g.font=`700 ${Math.round(cs*(t.name.length>=3?0.24:0.3))}px ${font}`; g.textAlign="center"; g.textBaseline="middle";
+    g.fillText(t.name, x+cs/2, y+cs/2);
+  }
+  const gold="#d9a441";
+  g.textAlign="left"; g.textBaseline="alphabetic";
+  g.fillStyle=gold; g.font=`700 34px ${font}`; g.fillText(c.title, 1040, 100);
+  g.fillStyle="#cfcfca"; g.font=`500 24px ${font}`; g.fillText(`${c.date}　ターン${c.turn}`, 1040, 145);
+  g.fillStyle="#8d8d88"; g.font=`500 22px ${font}`; g.fillText(`勢力: ${c.nation.name}`, 1040, 185);
+  const cnt={}; for (const t of tiles){ const o=c.map[t.name]||"国人衆"; cnt[o]=(cnt[o]||0)+1; }
+  const top=Object.entries(cnt).filter(([o])=>o!=="国人衆").sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const mine=Object.entries(cnt).find(([o])=>isMine(c,o));
+  if (mine && !top.some(([o])=>o===mine[0])) top.push(mine);
+  g.fillStyle="#9a9a95"; g.font=`500 24px ${font}`; g.fillText("有力勢力", 1040, 300);
+  top.forEach(([o,n],i)=>{ const y=340+i*48; g.fillStyle=ownerColor(o); g.fillRect(1040,y,26,26); if(isMine(c,o)){g.strokeStyle="#f2c14e";g.lineWidth=3;g.strokeRect(1040,y,26,26);} g.fillStyle="#e6e6e1"; g.font=`500 24px ${font}`; g.fillText(`${o}　${n}国`, 1080, y+22); });
+  g.fillStyle=gold; g.font=`700 26px ${font}`; g.fillText("異史録", 1040, 850);
+  return new Promise(res=>cv.toBlob(b=>res(b),"image/png"));
+}
+async function openSnapshot(c){
+  const blob = await makeSnapshot(c);
+  if (S.shot && S.shot.url) URL.revokeObjectURL(S.shot.url);
+  S.shot = {blob, url:URL.createObjectURL(blob), msg:""};
+  render();
+}
+async function saveSnapshot(c){
+  if (!S.shot) return;
+  try {
+    await S.downloads.save({filename:`異史録_${c.title}_ターン${c.turn}.png`, data:S.shot.blob});
+    S.shot.msg = "保存しました。";
+  } catch(e){
+    S.shot.msg = e && e.code==="declined" ? "保存を取り消しました。" : "ここでは保存できませんでした。画像を長押しして保存してください。";
+  }
+  render();
+}
+const DOW = ["日","月","火","水","木","金","土"];
+function withDow(s){ const p = parseJDate(s); if (!p || p.d==null) return s; const d = new Date(2000,0,1); d.setFullYear(p.y, p.m-1, p.d); return `${s}${DOW[d.getDay()]}曜日`; }
+function parseJDate(s){ s=String(s||""); const m = s.match(/(\d{3,4})年(\d{1,2})月(\d{1,2})日/); if (m) return {y:+m[1], m:+m[2], d:+m[3]}; const y = s.match(/(\d{4})/), mo = s.match(/(\d{1,2})月/); return y ? {y:+y[1], m:mo?+mo[1]:1, d:null} : null; }
+function calendarView(c){
+  const cur = parseJDate(c.date) || {y:1560,m:1,d:1};
+  if (!S.calYM) S.calYM = {y:cur.y, m:cur.m};
+  const {y, m} = S.calYM;
+  const marks = {}; c.papers.forEach((p,i)=>{ const d = parseJDate(p.date); if (d && d.y===y && d.m===m) marks[d.d] = i; });
+  const first = new Date(y, m-1, 1); first.setFullYear(y); const startDow = (first.getDay()+6)%7, days = new Date(y, m, 0).getDate();
+  const grid = h("div",{class:"calgrid"}, ["月","火","水","木","金","土","日"].map(d=>h("span",{class:"dow"},d)));
+  for (let i=0;i<startDow;i++) grid.append(h("span"));
+  for (let d=1; d<=days; d++){
+    const isCur = cur.y===y && cur.m===m && cur.d===d, pi = marks[d];
+    grid.append(pi!=null ? h("button",{class:"cd mark"+(isCur?" cur":""),title:`ターン${c.papers[pi].turn}の記録`,onclick:()=>{S.cal=false;S.tab="paper";S.chronAll=false;S.paperIdx=pi;render();window.scrollTo(0,0);}},String(d)) : h("span",{class:"cd"+(isCur?" cur":"")},String(d)));
+  }
+  const prev = c.papers.length>1 ? c.papers[c.papers.length-1] : null;
+  const shift = (k)=>{ let mm=m+k, yy=y; if(mm<1){mm=12;yy--;} if(mm>12){mm=1;yy++;} S.calYM={y:yy,m:mm}; render(); };
+  return h("div",{class:"card cal"},
+    h("div",{class:"row",style:"justify-content:space-between"}, h("span",{class:"note"},"キャンペーンのカレンダー"), h("button",{class:"linkbtn","aria-label":"閉じる",onclick:()=>{S.cal=false;render();}},"×")),
+    h("div",{class:"row",style:"justify-content:space-between"}, h("button",{class:"linkbtn","aria-label":"前の月",onclick:()=>shift(-1)},"‹"), h("strong",{class:"calt"},`${y}年${m}月`), h("button",{class:"linkbtn","aria-label":"次の月",onclick:()=>shift(1)},"›")),
+    grid,
+    h("div",{class:"note"},"■ 現在の日付　□ ターンの区切り（押すとその時点の年代記へ）"),
+    h("div",{class:"calprev"}, h("div",{class:"row",style:"justify-content:space-between"}, h("span",{class:"note"},"前のターン"), h("strong",{style:"color:var(--part)"}, prev ? `ターン${prev.turn}・${prev.days!=null?prev.days+"日":"?"}` : "キャンペーン開始")),
+      prev ? h("button",{class:"btn ghost",onclick:()=>{S.cal=false;S.tab="paper";S.chronAll=false;S.paperIdx=null;render();window.scrollTo(0,0);}},"この間の出来事を読む →") : h("div",{class:"note"},"まだターンを進めていません。")));
+}
+const LAYERS = [["勢力図",-1,""],["石高",0,"万石"],["人口",1,"万人"],["動員兵力",2,"千人"],["安定",3,"%"]];
+function layerFill(c, name, own){
+  const L = LAYERS.find(x=>x[0]===S.layer);
+  if (!c.prov || !L || L[1]<0) return ownerColor(own);
+  const v = c.prov[name]; if (!v) return "#3a3c40";
+  const vals = Object.values(c.prov).map(x=>x[L[1]]); const lo = Math.min(...vals), hi = Math.max(...vals);
+  const t = hi>lo ? (v[L[1]]-lo)/(hi-lo) : 0.5;
+  return `hsl(38 ${Math.round(25+45*t)}% ${Math.round(22+40*t)}%)`;
+}
+function quickOrders(c){
+  const box = h("div",{class:"card quick"});
+  box.append(h("div",{class:"row",style:"justify-content:space-between"}, h("span",{class:"note",style:"letter-spacing:.2em"},"このラウンド"),
+    h("button",{class:"linkbtn",onclick:()=>{S.tab="orders";render();window.scrollTo(0,0);}}, c.queue.length?`命令 ${c.queue.length}件 ›`:"まだ命令はありません")));
+  const ta = h("textarea",{id:"orders",style:"min-height:70px",placeholder:"このラウンド、何をしますか？",disabled:!!c.over||null}); ta.value=S.draftOrders; ta.oninput=()=>S.draftOrders=ta.value;
+  const sel = h("select",{id:"turnlen","aria-label":"このターンの期間",style:"width:auto"}, TURN_LENS.map(l=>h("option",{value:l,selected:c.turnLen===l||null}, l)));
+  sel.onchange=()=>{ c.turnLen = sel.value; saveCamp(c); };
+  box.append(ta, h("div",{class:"row",style:"flex-wrap:nowrap"},
+    sel,
+    h("button",{class:"btn ghost",disabled:(!!S.busy||!!c.over)||null,onclick:()=>{ const t=S.draftOrders.trim(); if(!t) return; c.queue.push(t); S.draftOrders=""; saveCamp(c); render(); }},"命令を追加"),
+    h("button",{class:"btn",style:"margin-left:auto",disabled:(!!S.busy||!!c.over)||null,onclick:endTurn}, S.busy&&S.busy.label==="裁定中" ? "処理中…" : "ターン終了"+(c.queue.length?"・"+c.queue.length:""))));
+  return box;
+}
+function zoomBy(c, d){
+  const wrap = document.querySelector(".mapwrap"), old = S.mapZoom, nz = Math.max(1, Math.min(6, Math.round(old)+d));
+  if (!wrap || nz===old) return;
+  const k = nz/old, cx = wrap.scrollLeft + wrap.clientWidth/2, cy = wrap.scrollTop + wrap.clientHeight/2;
+  S.mapZoom = nz; (S.mapView ||= {})[c.id+":"+S.mapMode] = {l:Math.max(0,cx*k-wrap.clientWidth/2), t:Math.max(0,cy*k-wrap.clientHeight/2), z:nz};
+  render();
+}
+function enablePinch(wrap, svg){
+  const pts = new Map(); let base = null, drag = null;
+  const W0 = +svg.getAttribute("width"), H0 = +svg.getAttribute("height"), z0 = S.mapZoom;
+  const setZoom = (z, cx, cy)=>{
+    z = Math.max(1, Math.min(6, z));
+    const k = z / S.mapZoom, sx = wrap.scrollLeft + cx, sy = wrap.scrollTop + cy;
+    S.mapZoom = z;
+    svg.setAttribute("width", Math.round(W0*z/z0)); svg.setAttribute("height", Math.round(H0*z/z0));
+    wrap.scrollLeft = sx*k - cx; wrap.scrollTop = sy*k - cy;
+  };
+  wrap.addEventListener("pointerdown", e=>{ pts.set(e.pointerId, [e.clientX, e.clientY]); if (pts.size===2){ const [a,b]=[...pts.values()]; base = {d:Math.hypot(a[0]-b[0],a[1]-b[1]), z:S.mapZoom}; drag=null; } else if (e.pointerType==="mouse"){ drag = {x:e.clientX, y:e.clientY, l:wrap.scrollLeft, t:wrap.scrollTop, moved:false}; } });
+  wrap.addEventListener("pointermove", e=>{
+    if (pts.has(e.pointerId)) pts.set(e.pointerId, [e.clientX, e.clientY]);
+    if (base && pts.size===2){ e.preventDefault(); const [a,b]=[...pts.values()], r=wrap.getBoundingClientRect(); setZoom(base.z*Math.hypot(a[0]-b[0],a[1]-b[1])/base.d, (a[0]+b[0])/2-r.left, (a[1]+b[1])/2-r.top); }
+    else if (drag){ const dx=e.clientX-drag.x, dy=e.clientY-drag.y; if (Math.abs(dx)+Math.abs(dy)>4) drag.moved=true; wrap.scrollLeft=drag.l-dx; wrap.scrollTop=drag.t-dy; }
+  });
+  const end = e=>{ pts.delete(e.pointerId); if (pts.size<2) base=null; if (e.type!=="pointermove" && drag){ const moved = drag.moved; drag=null; if (moved){ const stop = ev=>{ ev.stopPropagation(); ev.preventDefault(); }; wrap.addEventListener("click", stop, {capture:true, once:true}); } } };
+  wrap.addEventListener("pointerup", end); wrap.addEventListener("pointercancel", end); wrap.addEventListener("pointerleave", end);
+  wrap.addEventListener("wheel", e=>{ if (!e.ctrlKey) return; e.preventDefault(); const r=wrap.getBoundingClientRect(); setZoom(S.mapZoom*(e.deltaY<0?1.1:0.9), e.clientX-r.left, e.clientY-r.top); }, {passive:false});
+}
+function mapView(c){
+  const tiles = MAPS[c.setup.mapId] || [];
+  const byName = Object.fromEntries(tiles.map(t=>[t.name,t]));
+  const ownerOf = (n)=>c.map[n]||"国人衆";
+  const w = h("div");
+  w.append(h("div",{class:"maphead"},
+    h("div",null, h("div",{class:"note"},"勢力"), h("strong",null,c.nation.name)),
+    h("button",{class:"datebtn",onclick:()=>{S.cal=!S.cal;S.calYM=null;render();}}, h("strong",null,withDow(c.date)), h("div",{class:"note"},`ターン ${c.turn}・${c.elapsed}日経過 ▾`))));
+  if (S.cal) w.append(calendarView(c));
+  w.append(h("div",{class:"row maptools"},
+    h("button",{class:"chip","aria-pressed":String(S.mapMode==="real"),onclick:()=>{S.mapMode="real";render();}},"地形"),
+    h("button",{class:"chip","aria-pressed":String(S.mapMode==="grid"),onclick:()=>{S.mapMode="grid";render();}},"マス目"),
+    S.mapMode==="real" ? h("button",{class:"chip","aria-label":"縮小",disabled:S.mapZoom<=1||null,onclick:()=>{zoomBy(c,-1);}},"－") : null,
+    S.mapMode==="real" ? h("button",{class:"chip","aria-label":"拡大",disabled:S.mapZoom>=6||null,onclick:()=>{zoomBy(c,1);}},"＋") : null,
+    h("button",{class:"chip",style:"margin-left:auto",onclick:()=>openSnapshot(c)},"📸")));
+  if (c.prov) w.append(h("div",{class:"row maptools"}, LAYERS.map(([k])=>h("button",{class:"chip small","aria-pressed":String(S.layer===k),onclick:()=>{S.layer=k;render();}},k))));
+  if (S.shot) w.append(h("div",{class:"shot"},
+    h("img",{src:S.shot.url,alt:`${c.title}の勢力図（${c.date}）`}),
+    h("div",{class:"row"},
+      S.downloads ? h("button",{class:"btn",onclick:()=>saveSnapshot(c)},"画像を保存") : h("span",{class:"note"},"画像を長押しすると保存できます。"),
+      h("button",{class:"btn ghost",onclick:()=>{URL.revokeObjectURL(S.shot.url);S.shot=null;render();}},"閉じる")),
+    S.shot.msg ? h("p",{class:"note",style:"margin:0"},S.shot.msg) : null));
+  // 直近ターンの出来事を区画に紐づける
+  const lastP = c.papers[c.papers.length-1] || {};
+  const evBy = {};
+  for (const e of (lastP.events||[])) if (e.province && byName[e.province]) (evBy[e.province]=evBy[e.province]||[]).push(e);
+  const info = h("div",{class:"tileinfo",id:"tileinfo"},"マスをタップすると領土情報、白い点をタップするとその地の報告を表示します。");
+  const showInfo = (t, focusEv)=>{
+    const o = ownerOf(t.name), mine = isMine(c,o);
+    const n = tiles.filter(u=>ownerOf(u.name)===o).length;
+    const adj = tiles.filter(u=>Math.abs(u.col-t.col)+Math.abs(u.row-t.row)===1);
+    const evs = evBy[t.name]||[];
+    const ct = findContact(c, o) || (o!=="国人衆" ? null : null);
+    info.replaceChildren(h("div",{class:"tcard"+(focusEv?" focus":"")},
+      h("div",{class:"note"}, focusEv ? "地図上の報告" : "領土"),
+      h("div",{class:"tn"}, t.name),
+      h("div",{class:"row"}, h("span",{class:"sw",style:`background:${ownerColor(o)}`}), h("strong",null,o), h("span",{class:"note"}, mine?"（あなた）":""), h("span",{class:"note"}, `${n}国`)),
+      c.prov && c.prov[t.name] ? h("div",{class:"pstats"}, LAYERS.slice(1).map(([k,i,u])=>h("span",null,h("small",null,k),`${c.prov[t.name][i].toLocaleString()}${u}`))) : null,
+      h("div",{class:"note"}, "隣接地域 "+adj.length+"："+adj.map(u=>`${u.name}（${ownerOf(u.name)}）`).join("、")),
+      evs.length ? h("div",{class:"tev"}, h("div",{class:"note"},"年代記"), evs.map(e=>h("p",null,h("span",{class:"cat",style:`color:${catColor(e.category)}`},e.category)," ",e.date," ",e.text))) : null,
+      !mine && ct ? h("button",{class:"btn ghost",onclick:()=>{ S.tab="dip"; S.dipWith=o; c.dipLog.forEach(x=>{ if(x.with===o) delete x.unread; }); render(); window.scrollTo(0,0); }}, "使節と対話（"+o+"）") :
+      (!mine && o!=="国人衆" ? h("button",{class:"btn ghost",onclick:()=>{ (c.others ||= []).push({name:o, role:"勢力"}); saveCamp(c); S.tab="dip"; S.dipWith=o; render(); window.scrollTo(0,0); }}, "使節を送る（"+o+"）") : null)));
+  };
+  let svg, mineXY = null;
+  const NS = "http://www.w3.org/2000/svg";
+  const mk = (tag, attrs)=>{ const e=document.createElementNS(NS,tag); for (const k in attrs) e.setAttribute(k, attrs[k]); return e; };
+  if (S.mapMode==="real"){
+    const G = buildGeo(), [x0,y0,x1,y1] = G.bounds, VW = x1-x0, VH = y1-y0;
+    const W = Math.round((Math.min(window.innerWidth,860)-34) * S.mapZoom), H = Math.round(W*VH/VW);
+    svg = mk("svg",{width:W, height:H, viewBox:`${x0} ${y0} ${VW} ${VH}`, role:"img", "aria-label":"実地形の勢力図"});
+    const defs = mk("defs",{}), clip = mk("clipPath",{id:"landclip"});
+    for (const pts of Object.values(G.islands)) clip.append(mk("path",{d:polyPath(pts)}));
+    defs.append(clip); svg.append(defs);
+    svg.append(mk("rect",{x:x0,y:y0,width:VW,height:VH,fill:"#14161a"}));
+    const gl = mk("g",{"clip-path":"url(#landclip)"});
+    const hi = mk("g",{"clip-path":"url(#landclip)"});
+    const fs = 7.5/Math.sqrt(S.mapZoom/2);
+    for (const t of tiles){
+      const cell = G.cells[t.name]; if (!cell) continue;
+      const o = ownerOf(t.name), mine = isMine(c,o);
+      const pth = mk("path",{d:polyPath(cell), fill:layerFill(c,t.name,o), stroke:"#14161a", "stroke-width":"0.7", "data-p":t.name});
+      pth.addEventListener("click",()=>showInfo(t,false));
+      gl.append(pth);
+      if (mine){ hi.append(mk("path",{d:polyPath(cell), fill:"none", stroke:"#f2c14e", "stroke-width":"2.2", "pointer-events":"none"})); if(!mineXY){ const [sx,sy]=G.sites[t.name]; mineXY=[(sx-x0)/VW*W,(sy-y0)/VH*H]; } }
+    }
+    svg.append(gl, hi);
+    for (const pts of Object.values(G.islands)) svg.append(mk("path",{d:polyPath(pts), fill:"none", stroke:"rgba(255,255,255,.55)", "stroke-width":"0.6", "pointer-events":"none"}));
+    for (const t of tiles){
+      const [sx,sy] = G.sites[t.name]||[0,0];
+      const tx = mk("text",{x:sx, y:sy+fs*0.35, "text-anchor":"middle", "font-size":fs.toFixed(1)}); tx.textContent = t.name; svg.append(tx);
+      (evBy[t.name]||[]).slice(0,3).forEach((e,i)=>{
+        const g = mk("g",{class:"evdot"}), cx = sx+(i-((evBy[t.name].length-1)/2))*fs*1.3, cy = sy-fs*1.2, r = fs*0.6;
+        g.append(mk("circle",{cx, cy, r, fill:"#fff"}), mk("circle",{cx, cy, r:r*0.5, fill:catColor(e.category)}), mk("circle",{cx, cy, r:r*1.8, fill:"transparent"}));
+        const tt = mk("title",{}); tt.textContent = `${e.category}: ${e.text}`; g.append(tt);
+        g.addEventListener("click",(ev)=>{ ev.stopPropagation(); showInfo(t,true); });
+        svg.append(g);
+      });
+    }
+  } else {
+  const minC = Math.min(...tiles.map(t=>t.col)), maxC = Math.max(...tiles.map(t=>t.col)), maxR = Math.max(...tiles.map(t=>t.row));
+  const CS = 36, G = 2, PAD = 8, W = (maxC-minC+1)*CS+PAD*2, H = (maxR+1)*CS+PAD*2;
+  svg = document.createElementNS(NS,"svg");
+  svg.setAttribute("width",W); svg.setAttribute("height",H); svg.setAttribute("viewBox",`0 0 ${W} ${H}`); svg.setAttribute("role","img"); svg.setAttribute("aria-label","令制国のマス目で表した勢力図");
+  for (const t of tiles){
+    const o = ownerOf(t.name), x = PAD+(t.col-minC)*CS, y = PAD+t.row*CS, mine = isMine(c,o);
+    const r = document.createElementNS(NS,"rect");
+    r.setAttribute("x",x+G/2); r.setAttribute("y",y+G/2); r.setAttribute("width",CS-G); r.setAttribute("height",CS-G);
+    r.setAttribute("fill",layerFill(c,t.name,o)); r.setAttribute("rx","3");
+    if (mine){ r.setAttribute("stroke","#f2c14e"); r.setAttribute("stroke-width","3"); if(!mineXY) mineXY=[x,y]; }
+    r.addEventListener("click",()=>showInfo(t,false));
+    const tx = document.createElementNS(NS,"text");
+    tx.setAttribute("x",x+CS/2); tx.setAttribute("y",y+CS/2+3.5); tx.setAttribute("text-anchor","middle");
+    if (t.name.length>=3) tx.setAttribute("font-size","9");
+    tx.textContent = t.name;
+    svg.append(r,tx);
+    (evBy[t.name]||[]).slice(0,3).forEach((e,i)=>{
+      const g = document.createElementNS(NS,"g"); g.setAttribute("class","evdot");
+      const cx = x+CS-7-i*9, cy = y+7;
+      const ring = document.createElementNS(NS,"circle"); ring.setAttribute("cx",cx); ring.setAttribute("cy",cy); ring.setAttribute("r","5.5"); ring.setAttribute("fill","#fff");
+      const core = document.createElementNS(NS,"circle"); core.setAttribute("cx",cx); core.setAttribute("cy",cy); core.setAttribute("r","2.8"); core.setAttribute("fill",catColor(e.category));
+      const hit = document.createElementNS(NS,"circle"); hit.setAttribute("cx",cx); hit.setAttribute("cy",cy); hit.setAttribute("r","9"); hit.setAttribute("fill","transparent");
+      const tt = document.createElementNS(NS,"title"); tt.textContent = `${e.category}: ${e.text}`;
+      g.append(ring,core,hit,tt);
+      g.addEventListener("click",(ev)=>{ ev.stopPropagation(); showInfo(t,true); });
+      svg.append(g);
+    });
+  }
+  }
+  const wrap = h("div",{class:"mapwrap"}); wrap.append(svg);
+  if (S.mapMode==="real") enablePinch(wrap, svg);
+  w.append(wrap, info);
+  w.append(quickOrders(c));
+  if (c.prov && S.layer!=="勢力図"){ const L=LAYERS.find(x=>x[0]===S.layer); const vals=Object.values(c.prov).map(x=>x[L[1]]); w.append(h("div",{class:"legend"}, h("span",{class:"note"},`${S.layer}（推定）:`), h("span",null,h("i",{style:"background:hsl(38 25% 22%)"}),`${Math.min(...vals)}${L[2]}`), h("span",null,h("i",{style:"background:hsl(38 70% 62%)"}),`${Math.max(...vals)}${L[2]}`))); }
+  const cats = [...new Set((lastP.events||[]).filter(e=>evBy[e.province]).map(e=>e.category))];
+  if (cats.length) w.append(h("div",{class:"legend"}, h("span",{class:"note"},"報告の点:"), cats.map(k=>h("span",null,h("i",{style:`background:${catColor(k)};border-radius:50%;box-shadow:0 0 0 2px #fff inset`}),k))));
+  const cnt = {}; for (const t of tiles){ const o=ownerOf(t.name); cnt[o]=(cnt[o]||0)+1; }
+  const top = Object.entries(cnt).filter(([o])=>o!=="国人衆").sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const mineEntry = Object.entries(cnt).find(([o])=>isMine(c,o));
+  if (mineEntry && !top.some(([o])=>o===mineEntry[0])) top.unshift(mineEntry);
+  w.append(h("h3",null,"有力勢力"), h("div",{class:"legend"}, top.map(([o,n])=>h("span",null,h("i",{style:`background:${ownerColor(o)}`+(isMine(c,o)?";outline:2px solid #f2c14e":"")}),`${o} ${n}国`))));
+  w.append(h("p",{class:"note"},"金色の枠が自勢力です。マス目は令制国を簡略化した配置で、実際の地形・面積とは異なります。"));
+  const mv = (S.mapView ||= {}), key = c.id+":"+S.mapMode;
+  requestAnimationFrame(()=>{
+    const saved = mv[key];
+    if (saved && saved.z===S.mapZoom){ wrap.scrollLeft = saved.l; wrap.scrollTop = saved.t; }
+    else if (mineXY){ wrap.scrollLeft = Math.max(0, mineXY[0]-wrap.clientWidth/2); wrap.scrollTop = Math.max(0, mineXY[1]-wrap.clientHeight/2); }
+    wrap.addEventListener("scroll", ()=>{ mv[key] = {l:wrap.scrollLeft, t:wrap.scrollTop, z:S.mapZoom}; }, {passive:true});
+    mv[key] = {l:wrap.scrollLeft, t:wrap.scrollTop, z:S.mapZoom};
+  });
+  return w;
+}
+function spark(hist){
+  const NS="http://www.w3.org/2000/svg", W=120, H=34;
+  const svg=document.createElementNS(NS,"svg"); svg.setAttribute("viewBox",`0 0 ${W} ${H}`); svg.setAttribute("width",W); svg.setAttribute("height",H); svg.setAttribute("aria-hidden","true");
+  const vals = hist.map(x=>x[1]); if (vals.length<2) vals.unshift(vals[0]??0);
+  const lo=Math.min(...vals), hi=Math.max(...vals), span=(hi-lo)||1;
+  const pts = vals.map((v,i)=>[2+i*(W-6)/(vals.length-1), H-4-(v-lo)/span*(H-10)]);
+  const area=document.createElementNS(NS,"path"); area.setAttribute("d",`M${pts[0][0]},${H-2} `+pts.map(p=>`L${p[0]},${p[1]}`).join(" ")+` L${pts[pts.length-1][0]},${H-2} Z`); area.setAttribute("fill","rgba(31,78,121,.12)");
+  const line=document.createElementNS(NS,"polyline"); line.setAttribute("points",pts.map(p=>p.join(",")).join(" ")); line.setAttribute("fill","none"); line.setAttribute("stroke","var(--accent)"); line.setAttribute("stroke-width","1.6");
+  const dot=document.createElementNS(NS,"circle"); const L=pts[pts.length-1]; dot.setAttribute("cx",L[0]); dot.setAttribute("cy",L[1]); dot.setAttribute("r","2.6"); dot.setAttribute("fill","var(--accent)");
+  svg.append(area,line,dot); return svg;
+}
+function stateView(c){
+  const w = h("div",{class:"stack"});
+  w.append(h("h2",null,c.nation.name));
+  const myProv = c.map ? Object.values(c.map).filter(o=>isMine(c,o)).length : null;
+  w.append(h("p",{class:"note",style:"margin:0"},`${c.nation.leader}　${c.date}　ターン${c.turn}・${c.elapsed}日経過`+(myProv!=null?`　領国 ${myProv}国`:"")));
+  w.append(h("p",{style:"margin:0"},c.nation.summary));
+  w.append(h("h3",null,"指標"));
+  const grid = h("div",{class:"mgrid"});
+  for (const m of c.metrics){
+    const prev = m.hist.length>1 ? m.hist[m.hist.length-2][1] : m.value;
+    const pct = prev ? Math.round((m.value-prev)/Math.abs(prev)*1000)/10 : 0;
+    grid.append(h("div",{class:"mcard"}, h("div",{class:"mn"},m.name), h("div",{class:"mv"}, String(m.value), h("small",null,m.unit||""), h("span",{class:"mp "+(pct>0?"up":pct<0?"down":"")}, (pct>0?"+":"")+pct+"%")), spark(m.hist)));
+  }
+  w.append(grid);
+  w.append(h("h3",null,`進行中の計画・${c.plans.filter(p=>p.status==="進行中").length}`));
+  if (!c.plans.length) w.append(h("p",{class:"note"},"数ターンかかる命令を出すと、ここに計画として記録されます。"));
+  for (const p of c.plans) w.append(h("div",{class:"plan"},
+    h("div",{class:"row",style:"justify-content:space-between;flex-wrap:nowrap;align-items:flex-start"}, h("span",{class:"pt"}, p.actor?h("span",{class:"qsrc",style:"margin-right:6px"},p.actor):null, p.title), h("span",{class:"ps "+(p.status==="完了"?"up":p.status==="頓挫"?"down":"")},p.status)),
+    h("div",{class:"bar"},h("i",{style:`width:${p.progress}%;background:${p.status==="頓挫"?"var(--ng)":"var(--accent)"}`})),
+    h("div",{class:"row note",style:"justify-content:space-between"}, h("span",null,p.progress+"%"), h("span",null,p.eta?"完了見込み "+p.eta:""))));
+  if ((c.plansDone||[]).length){
+    w.append(h("h3",null,`完了した計画・${c.plansDone.length}`));
+    for (const p of c.plansDone.slice().reverse()) w.append(h("div",{class:"plan"},
+      h("div",{class:"row",style:"justify-content:space-between;flex-wrap:nowrap;align-items:flex-start"}, h("span",{class:"pt"},p.title), h("span",{class:"ps "+(p.status==="完了"?"up":"down")},p.status)),
+      h("div",{class:"bar"},h("i",{style:`width:${p.status==="完了"?100:p.progress}%;background:${p.status==="完了"?"var(--ok)":"var(--ng)"}`})),
+      h("div",{class:"row note",style:"justify-content:space-between"}, h("span",null,`ターン${p.turn}`), h("span",null,p.eta?"見込み "+p.eta:""))));
+  }
+  if (c.nation.assets.length) w.append(h("div",null,h("h3",null,"主な拠点・資源"),h("ul",{style:"margin:0;padding-left:1.2em"},c.nation.assets.map(a=>h("li",null,a)))));
+  w.append(h("h3",null,"諸勢力"));
+  w.append(h("div",{class:"row"},h("button",{class:"chip","aria-pressed":String(S.god),onclick:()=>{S.god=!S.god;render();}},S.god?"神の視点: 表示中":"神の視点（秘密を見る）")));
+  for (const r of c.rivals){
+    const a = r.attitude, left = a>=0?50:50+a/2, width=Math.abs(a)/2;
+    w.append(h("div",{class:"card rv"},
+      h("div",null,h("span",{class:"n"},r.name),h("span",{class:"s"},r.stance),h("span",{class:"note"}," "+(r.leader||""))),
+      h("div",{class:"att",title:`態度 ${a}`},h("i",{style:`left:${left}%;width:${width}%;background:${a>=0?"var(--ok)":"var(--ng)"}`})),
+      h("div",{class:"note"},r.public_note),
+      r.last_action ? h("div",{style:"font-size:13px"},"最近: "+r.last_action) : null,
+      S.god ? h("div",{class:"secret"},"本音: "+r.hidden_agenda) : null));
+  }
+  w.append(h("h3",null,"世界が覚えていること"));
+  if (!(c.memory||[]).length) w.append(h("p",{class:"note"},"約束・恨み・借り・秘密など、長く尾を引く出来事がここに残ります。"));
+  else w.append(h("ul",{style:"margin:0;padding-left:1.2em;font-size:14px"}, c.memory.slice().reverse().map(x=>h("li",null, h("span",{class:"note"},`ターン${x.turn}${x.with?"・"+x.with:""}　`), x.fact))));
+  w.append(h("h3",null,"約束"));
+  if (!c.promises.length) w.append(h("p",{class:"note"},"記録された約束はありません。"));
+  else w.append(h("ul",{style:"margin:0;padding-left:1.2em"},c.promises.map(p=>h("li",null,`${p.with}: ${p.text}${p.due?`［期限: ${p.due}］`:""}（${p.status}）`))));
+  w.append(h("h3",null,"これまでの歩み"));
+  w.append(h("ul",{style:"margin:0;padding-left:1.2em;font-size:14px"},c.chronicle.slice().reverse().map(x=>h("li",null,h("strong",null,(x.turn===0?"開始":`ターン${x.turn}`)+"（"+x.date+"） "),x.summary))));
+  w.append(h("div",{class:"row",style:"margin-top:8px"},h("button",{class:"btn ghost",onclick:()=>{S.tab="settings";render();window.scrollTo(0,0);}},"設定・書き出し")));
+  return w;
+}
+
+function settingsView(c){
+  const w = h("div",{class:"stack"});
+  w.append(h("button",{class:"linkbtn",onclick:()=>{S.tab="state";render();}},"← 国情へ"));
+  w.append(h("h2",null,"設定"));
+  w.append(h("div",{class:"card"},
+    h("div",null,h("strong",null,"舞台: "),c.setup.era),
+    h("div",null,h("strong",null,"モード: "),c.setup.mode==="crucible"?"クルーシブル":"標準","　",h("strong",null,"1ターン: "),c.setup.unit),
+    h("div",{class:"note"},S.storage==="cloud"?"セーブはこの端末のブラウザ内（IndexedDB）に保存されます。別端末へ移す場合はJSONを書き出してください。":"セーブはこの端末内のみです。消えないよう時々書き出してください。")));
+  w.append(h("h3",null,"書き出し"));
+  const out = h("textarea",{id:"exp",readonly:true,style:"min-height:80px"}); out.value = JSON.stringify(c);
+  w.append(out, h("div",{class:"row"},h("button",{class:"btn ghost",onclick:async(e)=>{ try{ await navigator.clipboard.writeText(out.value); e.target.textContent="コピーしました"; } catch(err){ out.select(); e.target.textContent="選択しました。長押しでコピー"; } }},"コピー")));
+  w.append(h("h3",null,"このキャンペーンを削除"));
+  const del = h("button",{class:"btn danger",onclick:async(e)=>{
+    if (e.target.dataset.armed!=="1"){ e.target.dataset.armed="1"; e.target.textContent="もう一度押すと削除します"; return; }
+    await deleteCamp(c); S.cur=null; S.view="home"; render(); }},"削除");
+  w.append(h("div",{class:"row"},del));
+  return w;
+}
+
+/* ---------- 起動 ---------- */
+render();
+(async()=>{
+  try {
+    if (window.claude && window.claude.use){
+      const [sample, db, user, downloads] = await Promise.all([claude.use("sample"), claude.use("db"), claude.use("user"), claude.use("downloads")]);
+      S.sample = sample; S.db = db; S.downloads = downloads;
+      if (user) { try { S.uid = await user.id(); } catch(e){} }
+    }
+  } catch(e){}
+  await loadCamps();
+  S.ready = true;
+  render();
+})();
+</script>
+</body>
+</html>
